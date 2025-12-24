@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Beef, Thermometer, TrendingUp, AlertCircle, Activity } from 'lucide-react';
+import { Beef, Thermometer, TrendingUp, AlertCircle, Activity, UserX } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DashboardStats {
   totalCows: number;
@@ -12,28 +13,39 @@ interface DashboardStats {
   recentHeatDetections: number;
 }
 
+interface AbsentStaff {
+  id: string;
+  name: string;
+  role: string | null;
+  absent_reason: string | null;
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [stats, setStats] = useState<DashboardStats>({
     totalCows: 0,
     healthyCows: 0,
     inHeatCows: 0,
     recentHeatDetections: 0,
   });
+  const [absentStaff, setAbsentStaff] = useState<AbsentStaff[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       if (!user) return;
 
-      const [cowsResult, heatResult] = await Promise.all([
+      const [cowsResult, heatResult, staffResult] = await Promise.all([
         supabase.from('cows').select('id, status').eq('user_id', user.id),
         supabase.from('heat_records').select('id').eq('user_id', user.id)
           .gte('detected_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+        supabase.from('staff').select('id, name, role, absent_reason').eq('user_id', user.id).eq('is_absent', true),
       ]);
 
       const cows = cowsResult.data || [];
       const heatRecords = heatResult.data || [];
+      const absent = staffResult.data || [];
 
       setStats({
         totalCows: cows.length,
@@ -41,6 +53,7 @@ export default function Dashboard() {
         inHeatCows: cows.filter(c => c.status === 'in_heat').length,
         recentHeatDetections: heatRecords.length,
       });
+      setAbsentStaff(absent);
       setLoading(false);
     }
 
@@ -49,28 +62,28 @@ export default function Dashboard() {
 
   const statCards = [
     {
-      title: 'Total Cows',
+      title: t('totalCows'),
       value: stats.totalCows,
       icon: Beef,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
     },
     {
-      title: 'Healthy',
+      title: t('healthy'),
       value: stats.healthyCows,
       icon: Activity,
       color: 'text-status-healthy',
       bgColor: 'bg-status-healthy/10',
     },
     {
-      title: 'In Heat',
+      title: t('inHeat'),
       value: stats.inHeatCows,
       icon: Thermometer,
       color: 'text-status-heat',
       bgColor: 'bg-status-heat/10',
     },
     {
-      title: 'Heat Detections (7d)',
+      title: t('heatDetections'),
       value: stats.recentHeatDetections,
       icon: TrendingUp,
       color: 'text-accent',
@@ -83,7 +96,7 @@ export default function Dashboard() {
       <div className="p-6 lg:p-8 space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="font-display text-3xl font-bold text-foreground">Dashboard</h1>
+          <h1 className="font-display text-3xl font-bold text-foreground">{t('dashboard')}</h1>
           <p className="text-muted-foreground">Welcome back! Here's your farm overview.</p>
         </div>
 
@@ -108,13 +121,44 @@ export default function Dashboard() {
           ))}
         </div>
 
+        {/* Absent Staff Section */}
+        <Card className="shadow-soft">
+          <CardHeader>
+            <CardTitle className="font-display flex items-center gap-2">
+              <UserX className="h-5 w-5 text-destructive" />
+              {t('absentStaff')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : absentStaff.length === 0 ? (
+              <p className="text-muted-foreground">{t('noAbsentStaff')}</p>
+            ) : (
+              <div className="space-y-3">
+                {absentStaff.map((staff) => (
+                  <div key={staff.id} className="flex items-center justify-between p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <div>
+                      <p className="font-medium text-foreground">{staff.name}</p>
+                      {staff.role && <p className="text-sm text-muted-foreground">{staff.role}</p>}
+                    </div>
+                    {staff.absent_reason && (
+                      <span className="text-sm text-destructive">{staff.absent_reason}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Quick Actions & Info */}
         <div className="grid lg:grid-cols-2 gap-6">
           <Card className="shadow-soft">
             <CardHeader>
               <CardTitle className="font-display flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-accent" />
-                Quick Tips
+                {t('quickTips')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -135,7 +179,7 @@ export default function Dashboard() {
 
           <Card className="shadow-soft">
             <CardHeader>
-              <CardTitle className="font-display">Getting Started</CardTitle>
+              <CardTitle className="font-display">{t('gettingStarted')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
