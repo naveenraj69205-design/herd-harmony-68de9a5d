@@ -202,6 +202,51 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          is_purchased: boolean | null
+          month: number
+          name: string
+          notes: string | null
+          quantity: number | null
+          unit: string | null
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_purchased?: boolean | null
+          month: number
+          name: string
+          notes?: string | null
+          quantity?: number | null
+          unit?: string | null
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_purchased?: boolean | null
+          month?: number
+          name?: string
+          notes?: string | null
+          quantity?: number | null
+          unit?: string | null
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

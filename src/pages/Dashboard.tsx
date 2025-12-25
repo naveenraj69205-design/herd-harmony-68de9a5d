@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Beef, Thermometer, TrendingUp, AlertCircle, Activity, UserX } from 'lucide-react';
+import { Beef, Thermometer, TrendingUp, AlertCircle, Activity, UserX, Package, Plus, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 
 interface DashboardStats {
   totalCows: number;
@@ -20,6 +24,12 @@ interface AbsentStaff {
   absent_reason: string | null;
 }
 
+interface StockItem {
+  id: string;
+  name: string;
+  is_purchased: boolean;
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -30,22 +40,39 @@ export default function Dashboard() {
     recentHeatDetections: 0,
   });
   const [absentStaff, setAbsentStaff] = useState<AbsentStaff[]>([]);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [newItemName, setNewItemName] = useState('');
+  const [showAddItem, setShowAddItem] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+
+  const defaultFeedItems = [
+    'Napier grass',
+    'Guinea grass',
+    'Maize (green)',
+    'Sorghum',
+    'Berseem',
+    'Lucerne (alfalfa)',
+  ];
 
   useEffect(() => {
     async function fetchStats() {
       if (!user) return;
 
-      const [cowsResult, heatResult, staffResult] = await Promise.all([
+      const [cowsResult, heatResult, staffResult, stockResult] = await Promise.all([
         supabase.from('cows').select('id, status').eq('user_id', user.id),
         supabase.from('heat_records').select('id').eq('user_id', user.id)
           .gte('detected_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
         supabase.from('staff').select('id, name, role, absent_reason').eq('user_id', user.id).eq('is_absent', true),
+        supabase.from('stock_items').select('id, name, is_purchased').eq('user_id', user.id).eq('month', currentMonth).eq('year', currentYear),
       ]);
 
       const cows = cowsResult.data || [];
       const heatRecords = heatResult.data || [];
       const absent = staffResult.data || [];
+      const stock = stockResult.data || [];
 
       setStats({
         totalCows: cows.length,
@@ -54,11 +81,72 @@ export default function Dashboard() {
         recentHeatDetections: heatRecords.length,
       });
       setAbsentStaff(absent);
+      setStockItems(stock);
       setLoading(false);
     }
 
     fetchStats();
-  }, [user]);
+  }, [user, currentMonth, currentYear]);
+
+  const addDefaultItems = async () => {
+    if (!user) return;
+    
+    const itemsToAdd = defaultFeedItems.map(name => ({
+      user_id: user.id,
+      name,
+      month: currentMonth,
+      year: currentYear,
+      is_purchased: false,
+    }));
+
+    const { data, error } = await supabase.from('stock_items').insert(itemsToAdd).select('id, name, is_purchased');
+    if (error) {
+      toast.error('Failed to add items');
+    } else {
+      setStockItems(data || []);
+      toast.success(t('itemAdded'));
+    }
+  };
+
+  const addCustomItem = async () => {
+    if (!user || !newItemName.trim()) return;
+
+    const { data, error } = await supabase.from('stock_items').insert({
+      user_id: user.id,
+      name: newItemName.trim(),
+      month: currentMonth,
+      year: currentYear,
+      is_purchased: false,
+    }).select('id, name, is_purchased').single();
+
+    if (error) {
+      toast.error('Failed to add item');
+    } else {
+      setStockItems([...stockItems, data]);
+      setNewItemName('');
+      setShowAddItem(false);
+      toast.success(t('itemAdded'));
+    }
+  };
+
+  const togglePurchased = async (id: string, currentValue: boolean) => {
+    const { error } = await supabase.from('stock_items').update({ is_purchased: !currentValue }).eq('id', id);
+    if (error) {
+      toast.error('Failed to update item');
+    } else {
+      setStockItems(stockItems.map(item => item.id === id ? { ...item, is_purchased: !currentValue } : item));
+    }
+  };
+
+  const deleteItem = async (id: string) => {
+    const { error } = await supabase.from('stock_items').delete().eq('id', id);
+    if (error) {
+      toast.error('Failed to delete item');
+    } else {
+      setStockItems(stockItems.filter(item => item.id !== id));
+      toast.success(t('itemDeleted'));
+    }
+  };
 
   const statCards = [
     {
@@ -145,6 +233,78 @@ export default function Dashboard() {
                     {staff.absent_reason && (
                       <span className="text-sm text-destructive">{staff.absent_reason}</span>
                     )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Monthly Stock Items */}
+        <Card className="shadow-soft">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="font-display flex items-center gap-2">
+              <Package className="h-5 w-5 text-primary" />
+              {t('monthlyStock')} - {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </CardTitle>
+            <div className="flex gap-2">
+              {stockItems.length === 0 && !loading && (
+                <Button variant="outline" size="sm" onClick={addDefaultItems}>
+                  Add Recommended Items
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => setShowAddItem(!showAddItem)}>
+                <Plus className="h-4 w-4 mr-1" />
+                {t('addItem')}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {showAddItem && (
+              <div className="flex gap-2 mb-4">
+                <Input
+                  placeholder="Enter item name..."
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addCustomItem()}
+                />
+                <Button onClick={addCustomItem} disabled={!newItemName.trim()}>
+                  Add
+                </Button>
+              </div>
+            )}
+            {loading ? (
+              <p className="text-muted-foreground">Loading...</p>
+            ) : stockItems.length === 0 ? (
+              <p className="text-muted-foreground">{t('noStockItems')}</p>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {stockItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
+                      item.is_purchased
+                        ? 'bg-status-healthy/10 border-status-healthy/30'
+                        : 'bg-secondary/50 border-border'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={item.is_purchased}
+                        onCheckedChange={() => togglePurchased(item.id, item.is_purchased)}
+                      />
+                      <span className={item.is_purchased ? 'line-through text-muted-foreground' : 'text-foreground'}>
+                        {item.name}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                      onClick={() => deleteItem(item.id)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
               </div>
