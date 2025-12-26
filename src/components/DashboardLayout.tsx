@@ -79,7 +79,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <CowIcon className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="font-display font-bold text-lg text-foreground">MooAI</h1>
+              <h1 className="font-display font-bold text-lg text-foreground">AI Farm</h1>
               <p className="text-xs text-muted-foreground">Smart Breeding</p>
             </div>
           </Link>
@@ -132,7 +132,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <div className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center">
               <CowIcon className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-display font-bold text-foreground">MooAI</span>
+            <span className="font-display font-bold text-foreground">AI Farm</span>
           </Link>
           <Button 
             variant="ghost" 
