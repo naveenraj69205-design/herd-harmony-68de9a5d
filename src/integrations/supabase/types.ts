@@ -94,6 +94,8 @@ export type Database = {
           intensity: string | null
           is_inseminated: boolean | null
           notes: string | null
+          sensor_reading: number | null
+          sensor_type: string | null
           symptoms: string[] | null
           user_id: string
         }
@@ -107,6 +109,8 @@ export type Database = {
           intensity?: string | null
           is_inseminated?: boolean | null
           notes?: string | null
+          sensor_reading?: number | null
+          sensor_type?: string | null
           symptoms?: string[] | null
           user_id: string
         }
@@ -120,6 +124,8 @@ export type Database = {
           intensity?: string | null
           is_inseminated?: boolean | null
           notes?: string | null
+          sensor_reading?: number | null
+          sensor_type?: string | null
           symptoms?: string[] | null
           user_id?: string
         }

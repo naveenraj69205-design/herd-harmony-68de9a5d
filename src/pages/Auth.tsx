@@ -4,8 +4,26 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Beef, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { z } from 'zod';
+
+// Natural cow SVG icon component
+const CowIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path 
+      d="M12 4C10.5 4 9.5 5 9 6C8.5 5 7.5 4 6 4C4 4 2.5 5.5 2.5 7.5C2.5 9 3.5 10 4 10.5C3 11 2 12.5 2 14.5C2 17.5 4.5 20 8 20H16C19.5 20 22 17.5 22 14.5C22 12.5 21 11 20 10.5C20.5 10 21.5 9 21.5 7.5C21.5 5.5 20 4 18 4C16.5 4 15.5 5 15 6C14.5 5 13.5 4 12 4Z" 
+      fill="currentColor"
+    />
+    <circle cx="8.5" cy="12" r="1.5" fill="hsl(var(--background))" />
+    <circle cx="15.5" cy="12" r="1.5" fill="hsl(var(--background))" />
+    <ellipse cx="12" cy="16" rx="2.5" ry="1.5" fill="hsl(var(--background))" opacity="0.6" />
+  </svg>
+);
 
 const emailSchema = z.string().email('Please enter a valid email');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
@@ -73,10 +91,10 @@ export default function Auth() {
         
         <Link to="/" className="relative z-10 flex items-center gap-3">
           <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center shadow-primary">
-            <Beef className="h-6 w-6 text-primary-foreground" />
+            <CowIcon className="h-7 w-7 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-display font-bold text-2xl text-foreground">MooAI</h1>
+            <h1 className="font-display font-bold text-2xl text-foreground">AI Farm</h1>
             <p className="text-sm text-muted-foreground">Smart Breeding Platform</p>
           </div>
         </Link>
@@ -112,7 +130,7 @@ export default function Auth() {
         </div>
 
         <p className="relative z-10 text-sm text-muted-foreground">
-          © 2024 MooAI. All rights reserved.
+          © 2024 AI Farm. All rights reserved.
         </p>
       </div>
 
@@ -123,9 +141,9 @@ export default function Auth() {
           <div className="lg:hidden flex justify-center mb-8">
             <Link to="/" className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center shadow-primary">
-                <Beef className="h-6 w-6 text-primary-foreground" />
+                <CowIcon className="h-7 w-7 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-2xl text-foreground">MooAI</span>
+              <span className="font-display font-bold text-2xl text-foreground">AI Farm</span>
             </Link>
           </div>
 
