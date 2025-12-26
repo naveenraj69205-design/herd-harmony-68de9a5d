@@ -14,6 +14,8 @@ import CowManagement from "./pages/CowManagement";
 import HeatDetection from "./pages/HeatDetection";
 import Settings from "./pages/Settings";
 import AIChat from "./pages/AIChat";
+import StaffAttendance from "./pages/StaffAttendance";
+import BreedingCalendar from "./pages/BreedingCalendar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +37,8 @@ const App = () => (
                 <Route path="/heat" element={<ProtectedRoute><HeatDetection /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 <Route path="/chat" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+                <Route path="/staff" element={<ProtectedRoute><StaffAttendance /></ProtectedRoute>} />
+                <Route path="/calendar" element={<ProtectedRoute><BreedingCalendar /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

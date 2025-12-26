@@ -14,6 +14,118 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance_records: {
+        Row: {
+          biometric_id: string | null
+          biometric_type: string | null
+          check_in: string
+          check_out: string | null
+          created_at: string
+          id: string
+          location: string | null
+          notes: string | null
+          staff_id: string
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          biometric_id?: string | null
+          biometric_type?: string | null
+          check_in?: string
+          check_out?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          staff_id: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          biometric_id?: string | null
+          biometric_type?: string | null
+          check_in?: string
+          check_out?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          staff_id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      breeding_events: {
+        Row: {
+          cow_id: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          event_date: string
+          event_type: string
+          id: string
+          is_reminder_sent: boolean | null
+          notes: string | null
+          reminder_date: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cow_id: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_date: string
+          event_type: string
+          id?: string
+          is_reminder_sent?: boolean | null
+          notes?: string | null
+          reminder_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cow_id?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          is_reminder_sent?: boolean | null
+          notes?: string | null
+          reminder_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breeding_events_cow_id_fkey"
+            columns: ["cow_id"]
+            isOneToOne: false
+            referencedRelation: "cows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_messages: {
         Row: {
           content: string
@@ -82,6 +194,78 @@ export type Database = {
           weight?: number | null
         }
         Relationships: []
+      }
+      heat_alerts: {
+        Row: {
+          alert_type: string | null
+          cow_id: string
+          created_at: string
+          heat_record_id: string | null
+          id: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          message: string
+          optimal_breeding_end: string | null
+          optimal_breeding_start: string | null
+          sensor_reading: number | null
+          sensor_type: string | null
+          severity: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_type?: string | null
+          cow_id: string
+          created_at?: string
+          heat_record_id?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message: string
+          optimal_breeding_end?: string | null
+          optimal_breeding_start?: string | null
+          sensor_reading?: number | null
+          sensor_type?: string | null
+          severity?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string | null
+          cow_id?: string
+          created_at?: string
+          heat_record_id?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message?: string
+          optimal_breeding_end?: string | null
+          optimal_breeding_start?: string | null
+          sensor_reading?: number | null
+          sensor_type?: string | null
+          severity?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "heat_alerts_cow_id_fkey"
+            columns: ["cow_id"]
+            isOneToOne: false
+            referencedRelation: "cows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heat_alerts_heat_record_id_fkey"
+            columns: ["heat_record_id"]
+            isOneToOne: false
+            referencedRelation: "heat_records"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       heat_records: {
         Row: {
@@ -173,6 +357,8 @@ export type Database = {
         Row: {
           absent_reason: string | null
           absent_since: string | null
+          biometric_id: string | null
+          biometric_type: string | null
           created_at: string
           id: string
           is_absent: boolean
@@ -185,6 +371,8 @@ export type Database = {
         Insert: {
           absent_reason?: string | null
           absent_since?: string | null
+          biometric_id?: string | null
+          biometric_type?: string | null
           created_at?: string
           id?: string
           is_absent?: boolean
@@ -197,6 +385,8 @@ export type Database = {
         Update: {
           absent_reason?: string | null
           absent_since?: string | null
+          biometric_id?: string | null
+          biometric_type?: string | null
           created_at?: string
           id?: string
           is_absent?: boolean
