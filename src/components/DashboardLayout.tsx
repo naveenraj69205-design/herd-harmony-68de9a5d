@@ -6,7 +6,9 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  Users,
+  CalendarDays
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -51,6 +53,8 @@ const navItems = [
   { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
   { icon: CowNavIcon, label: 'Cows', path: '/cows' },
   { icon: Thermometer, label: 'Heat Detection', path: '/heat' },
+  { icon: CalendarDays, label: 'Breeding Calendar', path: '/calendar' },
+  { icon: Users, label: 'Staff Attendance', path: '/staff' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
