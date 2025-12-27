@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Beef, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Beef, Edit, Trash2, Thermometer, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -24,6 +24,21 @@ interface Cow {
   notes: string | null;
 }
 
+interface HeatRecord {
+  id: string;
+  cow_id: string;
+  detected_at: string;
+  intensity: string | null;
+  sensor_type: string | null;
+  sensor_reading: number | null;
+  ai_confidence: number | null;
+  symptoms: string[] | null;
+}
+
+interface CowWithSensorData extends Cow {
+  latestHeatRecord?: HeatRecord;
+}
+
 const statusColors: Record<string, string> = {
   healthy: 'bg-status-healthy text-white',
   pregnant: 'bg-status-pregnant text-white',
@@ -33,7 +48,7 @@ const statusColors: Record<string, string> = {
 
 export default function CowManagement() {
   const { user } = useAuth();
-  const [cows, setCows] = useState<Cow[]>([]);
+  const [cows, setCows] = useState<CowWithSensorData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -55,18 +70,37 @@ export default function CowManagement() {
   async function fetchCows() {
     if (!user) return;
     
-    const { data, error } = await supabase
+    // Fetch cows
+    const { data: cowsData, error: cowsError } = await supabase
       .from('cows')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
-    if (error) {
+    if (cowsError) {
       toast.error('Failed to load cows');
+      setLoading(false);
       return;
     }
 
-    setCows(data || []);
+    // Fetch latest heat records for each cow
+    const { data: heatRecords, error: heatError } = await supabase
+      .from('heat_records')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('detected_at', { ascending: false });
+
+    if (heatError) {
+      console.error('Failed to load heat records:', heatError);
+    }
+
+    // Map heat records to cows
+    const cowsWithSensorData: CowWithSensorData[] = (cowsData || []).map(cow => {
+      const latestHeatRecord = heatRecords?.find(record => record.cow_id === cow.id);
+      return { ...cow, latestHeatRecord };
+    });
+
+    setCows(cowsWithSensorData);
     setLoading(false);
   }
 
@@ -354,6 +388,53 @@ export default function CowManagement() {
                       </div>
                     )}
                   </div>
+
+                  {/* Sensor Data Section */}
+                  {cow.latestHeatRecord && (
+                    <div className="mt-4 pt-4 border-t border-border space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <Activity className="h-4 w-4 text-primary" />
+                        Latest Sensor Data
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        {cow.latestHeatRecord.sensor_type && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Sensor</span>
+                            <span className="text-foreground capitalize">{cow.latestHeatRecord.sensor_type.replace('_', ' ')}</span>
+                          </div>
+                        )}
+                        {cow.latestHeatRecord.sensor_reading !== null && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Reading</span>
+                            <span className="text-foreground">{cow.latestHeatRecord.sensor_reading}</span>
+                          </div>
+                        )}
+                        {cow.latestHeatRecord.intensity && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Heat Intensity</span>
+                            <Badge variant={
+                              cow.latestHeatRecord.intensity === 'high' ? 'destructive' :
+                              cow.latestHeatRecord.intensity === 'medium' ? 'default' : 'secondary'
+                            } className="text-xs">
+                              {cow.latestHeatRecord.intensity}
+                            </Badge>
+                          </div>
+                        )}
+                        {cow.latestHeatRecord.ai_confidence !== null && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">AI Confidence</span>
+                            <span className="text-foreground">{Math.round(cow.latestHeatRecord.ai_confidence * 100)}%</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Detected</span>
+                          <span className="text-foreground text-xs">
+                            {new Date(cow.latestHeatRecord.detected_at).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex gap-2 mt-4 pt-4 border-t border-border opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button 

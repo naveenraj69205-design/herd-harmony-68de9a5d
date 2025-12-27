@@ -34,7 +34,7 @@ export default function Landing() {
               <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-primary">
                 <CowIcon className="h-6 w-6 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-xl text-foreground">AI Farm</span>
+              <span className="font-display font-bold text-xl text-foreground">Breeding App</span>
             </Link>
 
             <div className="flex items-center gap-4">
@@ -176,7 +176,7 @@ export default function Landing() {
               Ready to Transform Your Farm?
             </h2>
             <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto">
-              Join hundreds of farmers already using AI Farm to improve their breeding success rates.
+              Join hundreds of farmers already using Breeding App to improve their breeding success rates.
             </p>
             <Link to="/auth">
               <Button 
@@ -200,10 +200,10 @@ export default function Landing() {
               <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
                 <CowIcon className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-foreground">AI Farm</span>
+              <span className="font-display font-bold text-foreground">Breeding App</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 AI Farm. All rights reserved.
+              © 2024 Breeding App. All rights reserved.
             </p>
           </div>
         </div>
