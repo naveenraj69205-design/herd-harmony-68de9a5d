@@ -8,7 +8,8 @@ import {
   Menu,
   X,
   Users,
-  CalendarDays
+  CalendarDays,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -54,6 +55,7 @@ const navItems = [
   { icon: CowNavIcon, label: 'Cows', path: '/cows' },
   { icon: Thermometer, label: 'Heat Detection', path: '/heat' },
   { icon: CalendarDays, label: 'Breeding Calendar', path: '/calendar' },
+  { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   { icon: Users, label: 'Staff Attendance', path: '/staff' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];

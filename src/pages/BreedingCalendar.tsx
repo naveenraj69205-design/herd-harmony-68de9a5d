@@ -396,7 +396,7 @@ export default function BreedingCalendar() {
 
         {/* Add Event Dialog */}
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add Breeding Event</DialogTitle>
             </DialogHeader>
@@ -438,7 +438,7 @@ export default function BreedingCalendar() {
 
               <div className="space-y-2">
                 <Label>Date</Label>
-                <div className="border rounded-lg p-3">
+                <div className="border rounded-lg p-3 max-h-[280px] overflow-y-auto">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
