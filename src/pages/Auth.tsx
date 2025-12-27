@@ -30,12 +30,13 @@ const passwordSchema = z.string().min(6, 'Password must be at least 6 characters
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -68,7 +69,10 @@ export default function Auth() {
 
     setLoading(true);
     
-    if (isLogin) {
+    if (isForgotPassword) {
+      await resetPassword(email);
+      setIsForgotPassword(false);
+    } else if (isLogin) {
       const { error } = await signIn(email, password);
       if (!error) {
         navigate('/dashboard');
@@ -94,7 +98,7 @@ export default function Auth() {
             <CowIcon className="h-7 w-7 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-display font-bold text-2xl text-foreground">AI Farm</h1>
+            <h1 className="font-display font-bold text-2xl text-foreground">Breeding App</h1>
             <p className="text-sm text-muted-foreground">Smart Breeding Platform</p>
           </div>
         </Link>
@@ -130,7 +134,7 @@ export default function Auth() {
         </div>
 
         <p className="relative z-10 text-sm text-muted-foreground">
-          © 2024 AI Farm. All rights reserved.
+          © 2024 Breeding App. All rights reserved.
         </p>
       </div>
 
@@ -143,23 +147,25 @@ export default function Auth() {
               <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center shadow-primary">
                 <CowIcon className="h-7 w-7 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-2xl text-foreground">AI Farm</span>
+              <span className="font-display font-bold text-2xl text-foreground">Breeding App</span>
             </Link>
           </div>
 
           <div className="text-center lg:text-left">
             <h2 className="font-display text-3xl font-bold text-foreground">
-              {isLogin ? 'Welcome back' : 'Create account'}
+              {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome back' : 'Create account'}
             </h2>
             <p className="mt-2 text-muted-foreground">
-              {isLogin 
-                ? 'Sign in to access your farm dashboard' 
-                : 'Get started with AI-powered breeding'}
+              {isForgotPassword 
+                ? 'Enter your email to receive a reset link'
+                : isLogin 
+                  ? 'Sign in to access your farm dashboard' 
+                  : 'Get started with AI-powered breeding'}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {!isLogin && (
+            {!isLogin && !isForgotPassword && (
               <div className="space-y-2 animate-fade-in">
                 <Label htmlFor="name" className="text-foreground">Full Name</Label>
                 <div className="relative">
@@ -197,26 +203,43 @@ export default function Auth() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors(prev => ({ ...prev, password: undefined }));
-                  }}
-                  className="pl-10 h-12 bg-card border-border focus:border-primary"
-                />
+            {!isForgotPassword && (
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors(prev => ({ ...prev, password: undefined }));
+                    }}
+                    className="pl-10 h-12 bg-card border-border focus:border-primary"
+                  />
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password}</p>
-              )}
-            </div>
+            )}
+
+            {isLogin && !isForgotPassword && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsForgotPassword(true);
+                    setErrors({});
+                  }}
+                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
 
             <Button 
               type="submit" 
@@ -228,11 +251,11 @@ export default function Auth() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  {isLogin ? 'Signing in...' : 'Creating account...'}
+                  {isForgotPassword ? 'Sending...' : isLogin ? 'Signing in...' : 'Creating account...'}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  {isLogin ? 'Sign In' : 'Create Account'}
+                  {isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In' : 'Create Account'}
                   <ArrowRight className="h-4 w-4" />
                 </span>
               )}
@@ -240,20 +263,33 @@ export default function Auth() {
           </form>
 
           <div className="text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setErrors({});
-              }}
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isLogin ? (
-                <>Don't have an account? <span className="font-semibold text-primary">Sign up</span></>
-              ) : (
-                <>Already have an account? <span className="font-semibold text-primary">Sign in</span></>
-              )}
-            </button>
+            {isForgotPassword ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotPassword(false);
+                  setErrors({});
+                }}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                <span className="font-semibold text-primary">← Back to Sign In</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setErrors({});
+                }}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                {isLogin ? (
+                  <>Don't have an account? <span className="font-semibold text-primary">Sign up</span></>
+                ) : (
+                  <>Already have an account? <span className="font-semibold text-primary">Sign in</span></>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
