@@ -8,10 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus, Search, Beef, Edit, Trash2, Thermometer, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { CowPhotoUpload } from '@/components/CowPhotoUpload';
 
 interface Cow {
   id: string;
@@ -22,6 +24,7 @@ interface Cow {
   weight: number | null;
   status: string;
   notes: string | null;
+  image_url: string | null;
 }
 
 interface HeatRecord {
@@ -214,96 +217,108 @@ export default function CowManagement() {
                 Add Cow
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md max-h-[90vh]">
               <DialogHeader>
                 <DialogTitle className="font-display">
                   {editingCow ? 'Edit Cow' : 'Add New Cow'}
                 </DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Name *</Label>
-                    <Input
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Bessie"
+              <ScrollArea className="max-h-[70vh] pr-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {editingCow && (
+                    <CowPhotoUpload
+                      cowId={editingCow.id}
+                      currentImageUrl={editingCow.image_url}
+                      onUploadComplete={(url) => {
+                        setEditingCow(prev => prev ? { ...prev, image_url: url } : null);
+                      }}
                     />
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Name *</Label>
+                      <Input
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Bessie"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Tag Number *</Label>
+                      <Input
+                        required
+                        value={formData.tag_number}
+                        onChange={(e) => setFormData(prev => ({ ...prev, tag_number: e.target.value }))}
+                        placeholder="COW-001"
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Tag Number *</Label>
-                    <Input
-                      required
-                      value={formData.tag_number}
-                      onChange={(e) => setFormData(prev => ({ ...prev, tag_number: e.target.value }))}
-                      placeholder="COW-001"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Breed</Label>
+                      <Input
+                        value={formData.breed}
+                        onChange={(e) => setFormData(prev => ({ ...prev, breed: e.target.value }))}
+                        placeholder="Holstein"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Weight (kg)</Label>
+                      <Input
+                        type="number"
+                        value={formData.weight}
+                        onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+                        placeholder="500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Date of Birth</Label>
+                      <Input
+                        type="date"
+                        value={formData.date_of_birth}
+                        onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Status</Label>
+                      <Select
+                        value={formData.status}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="healthy">Healthy</SelectItem>
+                          <SelectItem value="pregnant">Pregnant</SelectItem>
+                          <SelectItem value="sick">Sick</SelectItem>
+                          <SelectItem value="in_heat">In Heat</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label>Breed</Label>
-                    <Input
-                      value={formData.breed}
-                      onChange={(e) => setFormData(prev => ({ ...prev, breed: e.target.value }))}
-                      placeholder="Holstein"
+                    <Label>Notes</Label>
+                    <Textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                      placeholder="Additional notes..."
+                      rows={3}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Weight (kg)</Label>
-                    <Input
-                      type="number"
-                      value={formData.weight}
-                      onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
-                      placeholder="500"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Date of Birth</Label>
-                    <Input
-                      type="date"
-                      value={formData.date_of_birth}
-                      onChange={(e) => setFormData(prev => ({ ...prev, date_of_birth: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Status</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="healthy">Healthy</SelectItem>
-                        <SelectItem value="pregnant">Pregnant</SelectItem>
-                        <SelectItem value="sick">Sick</SelectItem>
-                        <SelectItem value="in_heat">In Heat</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Notes</Label>
-                  <Textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                    placeholder="Additional notes..."
-                    rows={3}
-                  />
-                </div>
-
-                <Button type="submit" className="w-full">
-                  {editingCow ? 'Update Cow' : 'Add Cow'}
-                </Button>
-              </form>
+                  <Button type="submit" className="w-full">
+                    {editingCow ? 'Update Cow' : 'Add Cow'}
+                  </Button>
+                </form>
+              </ScrollArea>
             </DialogContent>
           </Dialog>
         </div>
@@ -353,9 +368,17 @@ export default function CowManagement() {
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <Beef className="h-6 w-6 text-primary" />
-                      </div>
+                      {cow.image_url ? (
+                        <img 
+                          src={cow.image_url} 
+                          alt={cow.name}
+                          className="h-12 w-12 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                          <Beef className="h-6 w-6 text-primary" />
+                        </div>
+                      )}
                       <div>
                         <h3 className="font-display font-semibold text-foreground">{cow.name}</h3>
                         <p className="text-sm text-muted-foreground">{cow.tag_number}</p>
