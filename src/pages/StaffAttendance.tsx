@@ -36,12 +36,14 @@ import {
   LogIn,
   LogOut,
   Calendar,
-  Scan
+  Scan,
+  Wifi
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { format, isToday, startOfDay, endOfDay } from 'date-fns';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface Staff {
   id: string;
@@ -73,6 +75,7 @@ const BIOMETRIC_TYPES = [
 
 export default function StaffAttendance() {
   const { user } = useAuth();
+  const { showLocalNotification, permission } = usePushNotifications();
   const [staff, setStaff] = useState<Staff[]>([]);
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +85,7 @@ export default function StaffAttendance() {
   const [biometricType, setBiometricType] = useState('fingerprint');
   const [biometricId, setBiometricId] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
 
   // New staff form
   const [newStaffName, setNewStaffName] = useState('');
@@ -93,6 +97,77 @@ export default function StaffAttendance() {
   useEffect(() => {
     if (user) {
       fetchData();
+
+      // Subscribe to realtime attendance updates from biometric scanner
+      const channel = supabase
+        .channel('attendance-realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'attendance_records',
+          },
+          async (payload) => {
+            const newRecord = payload.new as AttendanceRecord;
+            
+            // Fetch staff details for the new record
+            const { data: staffData } = await supabase
+              .from('staff')
+              .select('name, role')
+              .eq('id', newRecord.staff_id)
+              .single();
+
+            const recordWithStaff = { ...newRecord, staff: staffData };
+            
+            setAttendance(prev => [recordWithStaff, ...prev]);
+            
+            if (staffData) {
+              toast.success(`${staffData.name} checked in via ${newRecord.biometric_type || 'biometric'}`);
+              if (permission === 'granted') {
+                showLocalNotification('Staff Check-in', `${staffData.name} has checked in`);
+              }
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'attendance_records',
+          },
+          async (payload) => {
+            const updatedRecord = payload.new as AttendanceRecord;
+            
+            // Fetch staff details
+            const { data: staffData } = await supabase
+              .from('staff')
+              .select('name, role')
+              .eq('id', updatedRecord.staff_id)
+              .single();
+
+            const recordWithStaff = { ...updatedRecord, staff: staffData };
+            
+            setAttendance(prev => 
+              prev.map(r => r.id === updatedRecord.id ? recordWithStaff : r)
+            );
+            
+            if (updatedRecord.check_out && staffData) {
+              toast.info(`${staffData.name} checked out via ${updatedRecord.biometric_type || 'biometric'}`);
+              if (permission === 'granted') {
+                showLocalNotification('Staff Check-out', `${staffData.name} has checked out`);
+              }
+            }
+          }
+        )
+        .subscribe((status) => {
+          setIsRealtimeConnected(status === 'SUBSCRIBED');
+        });
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 
@@ -233,7 +308,15 @@ export default function StaffAttendance() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="font-display text-3xl font-bold text-foreground">Staff Attendance</h1>
-            <p className="text-muted-foreground">Track staff attendance with biometric verification</p>
+            <p className="text-muted-foreground flex items-center gap-2">
+              Track staff attendance with biometric verification
+              {isRealtimeConnected && (
+                <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
+                  <Wifi className="h-3 w-3 mr-1" />
+                  Live
+                </Badge>
+              )}
+            </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setShowAddStaffDialog(true)}>
@@ -320,6 +403,9 @@ export default function StaffAttendance() {
               <div className="text-center py-8">
                 <Fingerprint className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-muted-foreground">No attendance records for today</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Records will appear automatically when staff scan their biometric
+                </p>
               </div>
             ) : (
               <Table>

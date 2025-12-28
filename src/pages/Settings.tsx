@@ -6,17 +6,19 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sun, Moon, User, MapPin, Globe } from 'lucide-react';
+import { Sun, Moon, User, MapPin, Globe, Bell } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 export default function Settings() {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { user } = useAuth();
+  const { isSupported, isSubscribed, subscribe, unsubscribe } = usePushNotifications();
   
   const [fullName, setFullName] = useState('');
   const [farmName, setFarmName] = useState('');
@@ -150,12 +152,40 @@ export default function Settings() {
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">{t('english')}</SelectItem>
-                  <SelectItem value="es">{t('spanish')}</SelectItem>
-                  <SelectItem value="fr">{t('french')}</SelectItem>
-                  <SelectItem value="sw">{t('swahili')}</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="sw">Kiswahili</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Push Notifications Section */}
+        <Card className="shadow-soft">
+          <CardHeader>
+            <CardTitle className="font-display flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Push Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/50">
+              <div className="flex items-center gap-3">
+                <Bell className="h-5 w-5" />
+                <div>
+                  <Label className="text-foreground font-medium">Enable Notifications</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {isSupported ? 'Get alerts for heat detection, sensor updates' : 'Not supported in this browser'}
+                  </p>
+                </div>
+              </div>
+              <Switch 
+                checked={isSubscribed} 
+                onCheckedChange={(checked) => checked ? subscribe() : unsubscribe()}
+                disabled={!isSupported}
+              />
             </div>
           </CardContent>
         </Card>
