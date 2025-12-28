@@ -195,6 +195,65 @@ export type Database = {
         }
         Relationships: []
       }
+      health_records: {
+        Row: {
+          cost: number | null
+          cow_id: string
+          created_at: string
+          diagnosis: string | null
+          follow_up_date: string | null
+          id: string
+          medications: string | null
+          notes: string | null
+          record_date: string
+          record_type: string
+          treatment: string | null
+          updated_at: string
+          user_id: string
+          veterinarian: string | null
+        }
+        Insert: {
+          cost?: number | null
+          cow_id: string
+          created_at?: string
+          diagnosis?: string | null
+          follow_up_date?: string | null
+          id?: string
+          medications?: string | null
+          notes?: string | null
+          record_date?: string
+          record_type: string
+          treatment?: string | null
+          updated_at?: string
+          user_id: string
+          veterinarian?: string | null
+        }
+        Update: {
+          cost?: number | null
+          cow_id?: string
+          created_at?: string
+          diagnosis?: string | null
+          follow_up_date?: string | null
+          id?: string
+          medications?: string | null
+          notes?: string | null
+          record_date?: string
+          record_type?: string
+          treatment?: string | null
+          updated_at?: string
+          user_id?: string
+          veterinarian?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_records_cow_id_fkey"
+            columns: ["cow_id"]
+            isOneToOne: false
+            referencedRelation: "cows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       heat_alerts: {
         Row: {
           alert_type: string | null
@@ -323,6 +382,59 @@ export type Database = {
           },
         ]
       }
+      milk_production: {
+        Row: {
+          cow_id: string
+          created_at: string
+          fat_percentage: number | null
+          id: string
+          is_automatic: boolean | null
+          notes: string | null
+          protein_percentage: number | null
+          quality_grade: string | null
+          quantity_liters: number
+          recorded_at: string
+          sensor_id: string | null
+          user_id: string
+        }
+        Insert: {
+          cow_id: string
+          created_at?: string
+          fat_percentage?: number | null
+          id?: string
+          is_automatic?: boolean | null
+          notes?: string | null
+          protein_percentage?: number | null
+          quality_grade?: string | null
+          quantity_liters: number
+          recorded_at?: string
+          sensor_id?: string | null
+          user_id: string
+        }
+        Update: {
+          cow_id?: string
+          created_at?: string
+          fat_percentage?: number | null
+          id?: string
+          is_automatic?: boolean | null
+          notes?: string | null
+          protein_percentage?: number | null
+          quality_grade?: string | null
+          quantity_liters?: number
+          recorded_at?: string
+          sensor_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milk_production_cow_id_fkey"
+            columns: ["cow_id"]
+            isOneToOne: false
+            referencedRelation: "cows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -349,6 +461,36 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth_key: string
+          created_at: string
+          endpoint: string
+          id: string
+          is_active: boolean | null
+          p256dh_key: string
+          user_id: string
+        }
+        Insert: {
+          auth_key: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          is_active?: boolean | null
+          p256dh_key: string
+          user_id: string
+        }
+        Update: {
+          auth_key?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          is_active?: boolean | null
+          p256dh_key?: string
           user_id?: string
         }
         Relationships: []
@@ -442,6 +584,47 @@ export type Database = {
           year?: number
         }
         Relationships: []
+      }
+      weight_sensor_readings: {
+        Row: {
+          cow_id: string
+          created_at: string
+          id: string
+          is_automatic: boolean | null
+          recorded_at: string
+          sensor_id: string | null
+          user_id: string
+          weight_kg: number
+        }
+        Insert: {
+          cow_id: string
+          created_at?: string
+          id?: string
+          is_automatic?: boolean | null
+          recorded_at?: string
+          sensor_id?: string | null
+          user_id: string
+          weight_kg: number
+        }
+        Update: {
+          cow_id?: string
+          created_at?: string
+          id?: string
+          is_automatic?: boolean | null
+          recorded_at?: string
+          sensor_id?: string | null
+          user_id?: string
+          weight_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weight_sensor_readings_cow_id_fkey"
+            columns: ["cow_id"]
+            isOneToOne: false
+            referencedRelation: "cows"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

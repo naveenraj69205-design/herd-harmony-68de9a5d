@@ -9,11 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, Search, Beef, Edit, Trash2, Thermometer, Activity } from 'lucide-react';
+import { Plus, Search, Beef, Edit, Trash2, Thermometer, Activity, Milk, Stethoscope, Scale } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { CowPhotoUpload } from '@/components/CowPhotoUpload';
+import { MilkProductionDialog } from '@/components/MilkProductionDialog';
+import { HealthRecordsDialog } from '@/components/HealthRecordsDialog';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface Cow {
   id: string;
@@ -38,8 +41,16 @@ interface HeatRecord {
   symptoms: string[] | null;
 }
 
+interface MilkProduction {
+  cow_id: string;
+  total_liters: number;
+  today_liters: number;
+}
+
 interface CowWithSensorData extends Cow {
   latestHeatRecord?: HeatRecord;
+  milkProduction?: MilkProduction;
+  latestWeight?: number;
 }
 
 const statusColors: Record<string, string> = {
@@ -51,11 +62,14 @@ const statusColors: Record<string, string> = {
 
 export default function CowManagement() {
   const { user } = useAuth();
+  const { showLocalNotification, permission } = usePushNotifications();
   const [cows, setCows] = useState<CowWithSensorData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCow, setEditingCow] = useState<Cow | null>(null);
+  const [selectedCowForMilk, setSelectedCowForMilk] = useState<CowWithSensorData | null>(null);
+  const [selectedCowForHealth, setSelectedCowForHealth] = useState<CowWithSensorData | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     tag_number: '',
@@ -67,7 +81,88 @@ export default function CowManagement() {
   });
 
   useEffect(() => {
-    fetchCows();
+    if (user) {
+      fetchCows();
+      
+      // Subscribe to realtime updates for cows
+      const cowsChannel = supabase
+        .channel('cows-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'cows',
+          },
+          () => {
+            fetchCows();
+          }
+        )
+        .subscribe();
+
+      // Subscribe to weight sensor updates
+      const weightChannel = supabase
+        .channel('weight-sensor-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'weight_sensor_readings',
+          },
+          async (payload) => {
+            const { cow_id, weight_kg } = payload.new as { cow_id: string; weight_kg: number };
+            
+            // Update cow weight in database
+            await supabase
+              .from('cows')
+              .update({ weight: weight_kg })
+              .eq('id', cow_id);
+            
+            // Update local state
+            setCows(prev => prev.map(cow => 
+              cow.id === cow_id ? { ...cow, weight: weight_kg, latestWeight: weight_kg } : cow
+            ));
+            
+            toast.info(`Weight updated for cow: ${weight_kg} kg`);
+            if (permission === 'granted') {
+              showLocalNotification('Weight Sensor Update', `Cow weight updated: ${weight_kg} kg`);
+            }
+          }
+        )
+        .subscribe();
+
+      // Subscribe to milk production updates
+      const milkChannel = supabase
+        .channel('milk-production-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'milk_production',
+          },
+          (payload) => {
+            const { cow_id, quantity_liters, is_automatic } = payload.new as { cow_id: string; quantity_liters: number; is_automatic: boolean };
+            
+            if (is_automatic) {
+              toast.info(`Milk production recorded: ${quantity_liters}L`);
+              if (permission === 'granted') {
+                showLocalNotification('Milk Sensor Update', `${quantity_liters}L recorded automatically`);
+              }
+            }
+            
+            fetchCows();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(cowsChannel);
+        supabase.removeChannel(weightChannel);
+        supabase.removeChannel(milkChannel);
+      };
+    }
   }, [user]);
 
   async function fetchCows() {
@@ -87,20 +182,51 @@ export default function CowManagement() {
     }
 
     // Fetch latest heat records for each cow
-    const { data: heatRecords, error: heatError } = await supabase
+    const { data: heatRecords } = await supabase
       .from('heat_records')
       .select('*')
       .eq('user_id', user.id)
       .order('detected_at', { ascending: false });
 
-    if (heatError) {
-      console.error('Failed to load heat records:', heatError);
-    }
+    // Fetch milk production data
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const { data: milkData } = await supabase
+      .from('milk_production')
+      .select('cow_id, quantity_liters, recorded_at')
+      .eq('user_id', user.id);
 
-    // Map heat records to cows
+    // Fetch latest weight readings
+    const { data: weightData } = await supabase
+      .from('weight_sensor_readings')
+      .select('cow_id, weight_kg, recorded_at')
+      .eq('user_id', user.id)
+      .order('recorded_at', { ascending: false });
+
+    // Map data to cows
     const cowsWithSensorData: CowWithSensorData[] = (cowsData || []).map(cow => {
       const latestHeatRecord = heatRecords?.find(record => record.cow_id === cow.id);
-      return { ...cow, latestHeatRecord };
+      
+      // Calculate milk production
+      const cowMilkRecords = milkData?.filter(m => m.cow_id === cow.id) || [];
+      const totalLiters = cowMilkRecords.reduce((sum, r) => sum + Number(r.quantity_liters), 0);
+      const todayRecords = cowMilkRecords.filter(r => new Date(r.recorded_at) >= today);
+      const todayLiters = todayRecords.reduce((sum, r) => sum + Number(r.quantity_liters), 0);
+      
+      // Get latest weight
+      const latestWeightRecord = weightData?.find(w => w.cow_id === cow.id);
+      
+      return { 
+        ...cow, 
+        latestHeatRecord,
+        milkProduction: {
+          cow_id: cow.id,
+          total_liters: totalLiters,
+          today_liters: todayLiters,
+        },
+        latestWeight: latestWeightRecord ? Number(latestWeightRecord.weight_kg) : cow.weight,
+      };
     });
 
     setCows(cowsWithSensorData);
@@ -204,7 +330,7 @@ export default function CowManagement() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="font-display text-3xl font-bold text-foreground">Cow Management</h1>
-            <p className="text-muted-foreground">Manage your herd information</p>
+            <p className="text-muted-foreground">Manage your herd information with real-time sensor updates</p>
           </div>
 
           <Dialog open={dialogOpen} onOpenChange={(open) => {
@@ -396,10 +522,13 @@ export default function CowManagement() {
                         <span className="text-foreground">{cow.breed}</span>
                       </div>
                     )}
-                    {cow.weight && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Weight</span>
-                        <span className="text-foreground">{cow.weight} kg</span>
+                    {(cow.latestWeight || cow.weight) && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <Scale className="h-3 w-3" />
+                          Weight
+                        </span>
+                        <span className="text-foreground">{cow.latestWeight || cow.weight} kg</span>
                       </div>
                     )}
                     {cow.date_of_birth && (
@@ -411,6 +540,26 @@ export default function CowManagement() {
                       </div>
                     )}
                   </div>
+
+                  {/* Milk Production Section */}
+                  {cow.milkProduction && (cow.milkProduction.total_liters > 0 || cow.milkProduction.today_liters > 0) && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                        <Milk className="h-4 w-4 text-blue-500" />
+                        Milk Production
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="p-2 rounded bg-blue-500/10 text-center">
+                          <p className="font-bold text-blue-500">{cow.milkProduction.today_liters.toFixed(1)}L</p>
+                          <p className="text-xs text-muted-foreground">Today</p>
+                        </div>
+                        <div className="p-2 rounded bg-purple-500/10 text-center">
+                          <p className="font-bold text-purple-500">{cow.milkProduction.total_liters.toFixed(1)}L</p>
+                          <p className="text-xs text-muted-foreground">Total</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Sensor Data Section */}
                   {cow.latestHeatRecord && (
@@ -459,19 +608,34 @@ export default function CowManagement() {
                     </div>
                   )}
 
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-border opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
                     <Button 
-                      variant="secondary" 
                       size="sm" 
-                      className="flex-1"
-                      onClick={() => openEditDialog(cow)}
+                      variant="outline"
+                      onClick={() => setSelectedCowForMilk(cow)}
                     >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
+                      <Milk className="h-4 w-4" />
+                      Milk
                     </Button>
                     <Button 
-                      variant="ghost" 
-                      size="sm"
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => setSelectedCowForHealth(cow)}
+                    >
+                      <Stethoscope className="h-4 w-4" />
+                      Health
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      onClick={() => openEditDialog(cow)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
                       className="text-destructive hover:text-destructive"
                       onClick={() => handleDelete(cow.id)}
                     >
@@ -484,6 +648,22 @@ export default function CowManagement() {
           </div>
         )}
       </div>
+
+      {/* Milk Production Dialog */}
+      <MilkProductionDialog
+        cowId={selectedCowForMilk?.id || ''}
+        cowName={selectedCowForMilk?.name || ''}
+        open={!!selectedCowForMilk}
+        onOpenChange={(open) => !open && setSelectedCowForMilk(null)}
+      />
+
+      {/* Health Records Dialog */}
+      <HealthRecordsDialog
+        cowId={selectedCowForHealth?.id || ''}
+        cowName={selectedCowForHealth?.name || ''}
+        open={!!selectedCowForHealth}
+        onOpenChange={(open) => !open && setSelectedCowForHealth(null)}
+      />
     </DashboardLayout>
   );
 }
