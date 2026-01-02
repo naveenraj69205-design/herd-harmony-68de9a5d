@@ -5,3 +5,15 @@ verify_jwt = false
 
 [functions.sensor-data]
 verify_jwt = false
+
+[functions.heat-detection]
+verify_jwt = false
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.health-records-api]
+verify_jwt = false
+
+[functions.breeding-events-api]
+verify_jwt = false
