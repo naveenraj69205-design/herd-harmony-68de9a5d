@@ -147,7 +147,7 @@ export default function Settings() {
           <CardContent>
             <div className="space-y-2">
               <Label>{t('selectLanguage')}</Label>
-              <Select value={language} onValueChange={(value: 'en' | 'es' | 'fr' | 'sw') => setLanguage(value)}>
+              <Select value={language} onValueChange={(value: 'en' | 'es' | 'fr' | 'sw' | 'ta' | 'hi') => setLanguage(value)}>
                 <SelectTrigger className="w-full sm:w-[280px]">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
@@ -156,6 +156,8 @@ export default function Settings() {
                   <SelectItem value="es">Español</SelectItem>
                   <SelectItem value="fr">Français</SelectItem>
                   <SelectItem value="sw">Kiswahili</SelectItem>
+                  <SelectItem value="ta">தமிழ் (Tamil)</SelectItem>
+                  <SelectItem value="hi">हिंदी (Hindi)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
