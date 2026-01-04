@@ -17,6 +17,7 @@ import AIChat from "./pages/AIChat";
 import StaffAttendance from "./pages/StaffAttendance";
 import BreedingCalendar from "./pages/BreedingCalendar";
 import Analytics from "./pages/Analytics";
+import SensorDashboard from "./pages/SensorDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/staff" element={<ProtectedRoute><StaffAttendance /></ProtectedRoute>} />
                 <Route path="/calendar" element={<ProtectedRoute><BreedingCalendar /></ProtectedRoute>} />
                 <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                <Route path="/sensors" element={<ProtectedRoute><SensorDashboard /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

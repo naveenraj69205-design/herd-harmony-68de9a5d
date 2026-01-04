@@ -9,7 +9,8 @@ import {
   X,
   Users,
   CalendarDays,
-  BarChart3
+  BarChart3,
+  Radio
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,6 +57,7 @@ const navItems = [
   { icon: Thermometer, label: 'Heat Detection', path: '/heat' },
   { icon: CalendarDays, label: 'Breeding Calendar', path: '/calendar' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+  { icon: Radio, label: 'Sensors', path: '/sensors' },
   { icon: Users, label: 'Staff Attendance', path: '/staff' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
