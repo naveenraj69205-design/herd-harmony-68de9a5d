@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.breeding-events-api]
 verify_jwt = false
+
+[functions.voice-to-text]
+verify_jwt = false
+
+[functions.text-to-speech]
+verify_jwt = false
