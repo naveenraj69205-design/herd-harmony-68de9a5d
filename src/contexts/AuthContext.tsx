@@ -93,17 +93,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const resetPassword = async (email: string) => {
     const redirectUrl = `${window.location.origin}/auth`;
     
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    // First get the reset link from Supabase
+    const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
 
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Password reset email sent! Check your inbox.');
+    if (supabaseError) {
+      toast.error(supabaseError.message);
+      return { error: supabaseError };
     }
 
-    return { error };
+    // Send custom email via edge function
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-password-reset`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            email,
+            resetLink: redirectUrl,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error('Failed to send custom email, but Supabase email was sent');
+      }
+    } catch (err) {
+      console.error('Edge function call failed:', err);
+      // Continue even if custom email fails - Supabase email is still sent
+    }
+
+    toast.success('Password reset email sent! Check your inbox.');
+    return { error: null };
   };
 
   return (

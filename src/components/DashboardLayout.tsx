@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import {
@@ -50,23 +51,26 @@ const CowNavIcon = ({ className }: { className?: string }) => (
   <CowIcon className={className} />
 );
 
-const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  { icon: MessageSquare, label: 'AI Chat', path: '/chat' },
-  { icon: CowNavIcon, label: 'Cows', path: '/cows' },
-  { icon: Thermometer, label: 'Heat Detection', path: '/heat' },
-  { icon: CalendarDays, label: 'Breeding Calendar', path: '/calendar' },
-  { icon: BarChart3, label: 'Analytics', path: '/analytics' },
-  { icon: Radio, label: 'Sensors', path: '/sensors' },
-  { icon: Users, label: 'Staff Attendance', path: '/staff' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
+const getNavItems = (t: (key: string) => string) => [
+  { icon: LayoutDashboard, label: t('dashboard'), path: '/dashboard' },
+  { icon: MessageSquare, label: t('aiAssistant'), path: '/chat' },
+  { icon: CowNavIcon, label: t('cowManagement'), path: '/cows' },
+  { icon: Thermometer, label: t('heatDetection'), path: '/heat' },
+  { icon: CalendarDays, label: t('breedingCalendar'), path: '/calendar' },
+  { icon: BarChart3, label: t('analytics'), path: '/analytics' },
+  { icon: Radio, label: t('sensorDashboard'), path: '/sensors' },
+  { icon: Users, label: t('staffAttendance'), path: '/staff' },
+  { icon: Settings, label: t('settings'), path: '/settings' },
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const { signOut, user } = useAuth();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const navItems = getNavItems(t);
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -128,7 +132,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             onClick={handleLogout}
           >
             <LogOut className="h-5 w-5" />
-            Sign Out
+            {t('signOut')}
           </Button>
         </div>
       </aside>
@@ -182,7 +186,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               }}
             >
               <LogOut className="h-5 w-5" />
-              Sign Out
+              {t('signOut')}
             </Button>
           </nav>
         )}
@@ -199,15 +203,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Sign Out</AlertDialogTitle>
+            <AlertDialogTitle>{t('signOut')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to sign out? You will need to sign in again to access your farm data.
+              {t('signOutConfirmation') || 'Are you sure you want to sign out? You will need to sign in again to access your farm data.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout}>
-              Sign Out
+              {t('signOut')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
