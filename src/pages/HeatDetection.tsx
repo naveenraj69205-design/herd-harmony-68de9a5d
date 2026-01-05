@@ -23,6 +23,7 @@ import {
 import { Thermometer, Plus, Calendar, Activity, Radio, Ear, Droplets, Milk } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 // Sensor types with descriptions
@@ -67,6 +68,7 @@ interface HeatRecord {
 
 export default function HeatDetection() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [records, setRecords] = useState<HeatRecord[]>([]);
   const [cows, setCows] = useState<Cow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -196,8 +198,8 @@ export default function HeatDetection() {
       <div className="p-6 lg:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl font-bold text-foreground">Heat Detection</h1>
-            <p className="text-muted-foreground">Monitor and track heat cycles with sensor data</p>
+            <h1 className="font-display text-3xl font-bold text-foreground">{t('heatDetection')}</h1>
+            <p className="text-muted-foreground">{t('heatDetectionDesc') || 'Monitor and track heat cycles with sensor data'}</p>
           </div>
           <Button variant="hero" onClick={() => setShowAddDialog(true)}>
             <Plus className="h-4 w-4" /> Record Heat

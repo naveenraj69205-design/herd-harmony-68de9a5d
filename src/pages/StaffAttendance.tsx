@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { format, isToday, startOfDay, endOfDay } from 'date-fns';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
@@ -75,6 +76,7 @@ const BIOMETRIC_TYPES = [
 
 export default function StaffAttendance() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { showLocalNotification, permission } = usePushNotifications();
   const [staff, setStaff] = useState<Staff[]>([]);
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
@@ -307,9 +309,9 @@ export default function StaffAttendance() {
       <div className="p-6 lg:p-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold text-foreground">Staff Attendance</h1>
+            <h1 className="font-display text-3xl font-bold text-foreground">{t('staffAttendance')}</h1>
             <p className="text-muted-foreground flex items-center gap-2">
-              Track staff attendance with biometric verification
+              {t('staffAttendanceDesc') || 'Track staff attendance with biometric verification'}
               {isRealtimeConnected && (
                 <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/30">
                   <Wifi className="h-3 w-3 mr-1" />
@@ -320,10 +322,10 @@ export default function StaffAttendance() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setShowAddStaffDialog(true)}>
-              <Plus className="h-4 w-4" /> Add Staff
+              <Plus className="h-4 w-4" /> {t('addStaff')}
             </Button>
             <Button variant="hero" onClick={() => setShowCheckInDialog(true)}>
-              <Fingerprint className="h-4 w-4" /> Check In
+              <Fingerprint className="h-4 w-4" /> {t('checkIn')}
             </Button>
           </div>
         </div>

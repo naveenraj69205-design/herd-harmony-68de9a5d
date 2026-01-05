@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   BarChart, 
   Bar, 
@@ -61,6 +62,7 @@ const COLORS = ['hsl(var(--status-healthy))', 'hsl(var(--status-pregnant))', 'hs
 
 export default function Analytics() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats>({
     totalCows: 0,
@@ -182,18 +184,18 @@ export default function Analytics() {
   };
 
   const pieData = [
-    { name: 'Healthy', value: stats.healthyCows },
-    { name: 'Pregnant', value: stats.pregnantCows },
-    { name: 'In Heat', value: stats.inHeatCows },
-    { name: 'Sick', value: stats.sickCows },
+    { name: t('healthy'), value: stats.healthyCows },
+    { name: t('pregnant'), value: stats.pregnantCows },
+    { name: t('inHeat'), value: stats.inHeatCows },
+    { name: t('sick'), value: stats.sickCows },
   ].filter(d => d.value > 0);
 
   return (
     <DashboardLayout>
       <div className="p-6 lg:p-8 space-y-6">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">Track your herd's breeding performance and milk production</p>
+          <h1 className="font-display text-3xl font-bold text-foreground">{t('analyticsDashboard')}</h1>
+          <p className="text-muted-foreground">{t('analyticsDesc')}</p>
         </div>
 
         {/* Stats Cards */}
@@ -206,7 +208,7 @@ export default function Analytics() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{stats.totalCows}</p>
-                  <p className="text-sm text-muted-foreground">Total Cows</p>
+                  <p className="text-sm text-muted-foreground">{t('totalCowsLabel')}</p>
                 </div>
               </div>
             </CardContent>
@@ -220,7 +222,7 @@ export default function Analytics() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{stats.totalHeatRecords}</p>
-                  <p className="text-sm text-muted-foreground">Heat Detections</p>
+                  <p className="text-sm text-muted-foreground">{t('heatDetectionsLabel')}</p>
                 </div>
               </div>
             </CardContent>
@@ -234,7 +236,7 @@ export default function Analytics() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{stats.totalMilkProduction.toFixed(0)}L</p>
-                  <p className="text-sm text-muted-foreground">30-Day Milk</p>
+                  <p className="text-sm text-muted-foreground">{t('thirtyDayMilk')}</p>
                 </div>
               </div>
             </CardContent>
@@ -248,7 +250,7 @@ export default function Analytics() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{stats.avgDailyMilk.toFixed(1)}L</p>
-                  <p className="text-sm text-muted-foreground">Avg/Day</p>
+                  <p className="text-sm text-muted-foreground">{t('avgPerDay')}</p>
                 </div>
               </div>
             </CardContent>
@@ -262,7 +264,7 @@ export default function Analytics() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{stats.successfulInseminations}</p>
-                  <p className="text-sm text-muted-foreground">Inseminations</p>
+                  <p className="text-sm text-muted-foreground">{t('inseminations')}</p>
                 </div>
               </div>
             </CardContent>
@@ -274,7 +276,7 @@ export default function Analytics() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Milk className="h-5 w-5 text-blue-500" />
-              Daily Milk Production (Last 14 Days)
+              {t('dailyMilkProduction')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -307,7 +309,7 @@ export default function Analytics() {
               </ResponsiveContainer>
             ) : (
               <div className="h-64 flex items-center justify-center text-muted-foreground">
-                No milk production data available
+                {t('noMilkData')}
               </div>
             )}
           </CardContent>
@@ -317,10 +319,10 @@ export default function Analytics() {
           {/* Herd Status Pie Chart */}
           <Card className="shadow-soft">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Herd Status Distribution
-              </CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              {t('herdStatusDistribution')}
+            </CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -345,10 +347,10 @@ export default function Analytics() {
                     <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
-              ) : (
-                <div className="h-64 flex items-center justify-center text-muted-foreground">
-                  No data available
-                </div>
+            ) : (
+              <div className="h-64 flex items-center justify-center text-muted-foreground">
+                {t('noDataAvailable')}
+              </div>
               )}
             </CardContent>
           </Card>
@@ -356,10 +358,10 @@ export default function Analytics() {
           {/* Monthly Trends */}
           <Card className="shadow-soft">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Monthly Breeding Trends
-              </CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              {t('monthlyBreedingTrends')}
+            </CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -376,21 +378,21 @@ export default function Analytics() {
                       type="monotone" 
                       dataKey="heatDetections" 
                       stroke="hsl(var(--status-heat))" 
-                      name="Heat Detections"
+                      name={t('heatDetectionsLabel')}
                       strokeWidth={2}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="inseminations" 
                       stroke="hsl(220, 80%, 60%)" 
-                      name="Inseminations"
+                      name={t('inseminations')}
                       strokeWidth={2}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="calvings" 
                       stroke="hsl(var(--status-healthy))" 
-                      name="Calvings"
+                      name={t('calvings')}
                       strokeWidth={2}
                     />
                   </LineChart>
@@ -405,7 +407,7 @@ export default function Analytics() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Activity Overview (Last 6 Months)
+              {t('activityOverview')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -419,9 +421,9 @@ export default function Analytics() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="heatDetections" fill="hsl(var(--status-heat))" name="Heat Detections" />
-                  <Bar dataKey="inseminations" fill="hsl(220, 80%, 60%)" name="Inseminations" />
-                  <Bar dataKey="calvings" fill="hsl(var(--status-healthy))" name="Calvings" />
+                  <Bar dataKey="heatDetections" fill="hsl(var(--status-heat))" name={t('heatDetectionsLabel')} />
+                  <Bar dataKey="inseminations" fill="hsl(220, 80%, 60%)" name={t('inseminations')} />
+                  <Bar dataKey="calvings" fill="hsl(var(--status-healthy))" name={t('calvings')} />
                 </BarChart>
               </ResponsiveContainer>
             )}

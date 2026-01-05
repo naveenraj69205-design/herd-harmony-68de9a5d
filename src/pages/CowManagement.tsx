@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus, Search, Beef, Edit, Trash2, Thermometer, Activity, Milk, Stethoscope, Scale } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { CowPhotoUpload } from '@/components/CowPhotoUpload';
 import { MilkProductionDialog } from '@/components/MilkProductionDialog';
@@ -62,6 +63,7 @@ const statusColors: Record<string, string> = {
 
 export default function CowManagement() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { showLocalNotification, permission } = usePushNotifications();
   const [cows, setCows] = useState<CowWithSensorData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -329,8 +331,8 @@ export default function CowManagement() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold text-foreground">Cow Management</h1>
-            <p className="text-muted-foreground">Manage your herd information with real-time sensor updates</p>
+            <h1 className="font-display text-3xl font-bold text-foreground">{t('cowManagement')}</h1>
+            <p className="text-muted-foreground">{t('cowManagementDesc')}</p>
           </div>
 
           <Dialog open={dialogOpen} onOpenChange={(open) => {
@@ -340,13 +342,13 @@ export default function CowManagement() {
             <DialogTrigger asChild>
               <Button variant="hero">
                 <Plus className="h-4 w-4" />
-                Add Cow
+                {t('addCow')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md max-h-[90vh]">
               <DialogHeader>
                 <DialogTitle className="font-display">
-                  {editingCow ? 'Edit Cow' : 'Add New Cow'}
+                  {editingCow ? t('editCow') : t('addNewCow')}
                 </DialogTitle>
               </DialogHeader>
               <ScrollArea className="max-h-[70vh] pr-4">
@@ -363,7 +365,7 @@ export default function CowManagement() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Name *</Label>
+                      <Label>{t('cowName')} *</Label>
                       <Input
                         required
                         value={formData.name}
@@ -372,7 +374,7 @@ export default function CowManagement() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Tag Number *</Label>
+                      <Label>{t('tagNumber')} *</Label>
                       <Input
                         required
                         value={formData.tag_number}
@@ -384,7 +386,7 @@ export default function CowManagement() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Breed</Label>
+                      <Label>{t('breed')}</Label>
                       <Input
                         value={formData.breed}
                         onChange={(e) => setFormData(prev => ({ ...prev, breed: e.target.value }))}
@@ -392,7 +394,7 @@ export default function CowManagement() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Weight (kg)</Label>
+                      <Label>{t('weight')} (kg)</Label>
                       <Input
                         type="number"
                         value={formData.weight}
@@ -404,7 +406,7 @@ export default function CowManagement() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Date of Birth</Label>
+                      <Label>{t('dateOfBirth')}</Label>
                       <Input
                         type="date"
                         value={formData.date_of_birth}
@@ -412,7 +414,7 @@ export default function CowManagement() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Status</Label>
+                      <Label>{t('status')}</Label>
                       <Select
                         value={formData.status}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
@@ -421,17 +423,17 @@ export default function CowManagement() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="healthy">Healthy</SelectItem>
-                          <SelectItem value="pregnant">Pregnant</SelectItem>
-                          <SelectItem value="sick">Sick</SelectItem>
-                          <SelectItem value="in_heat">In Heat</SelectItem>
+                          <SelectItem value="healthy">{t('healthy')}</SelectItem>
+                          <SelectItem value="pregnant">{t('pregnant')}</SelectItem>
+                          <SelectItem value="sick">{t('sick')}</SelectItem>
+                          <SelectItem value="in_heat">{t('inHeat')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Notes</Label>
+                    <Label>{t('notes')}</Label>
                     <Textarea
                       value={formData.notes}
                       onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
@@ -441,7 +443,7 @@ export default function CowManagement() {
                   </div>
 
                   <Button type="submit" className="w-full">
-                    {editingCow ? 'Update Cow' : 'Add Cow'}
+                    {editingCow ? t('updateCow') : t('addCow')}
                   </Button>
                 </form>
               </ScrollArea>
@@ -453,7 +455,7 @@ export default function CowManagement() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name or tag..."
+            placeholder={t('searchByNameOrTag')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -474,15 +476,15 @@ export default function CowManagement() {
             <CardContent className="p-12 text-center">
               <Beef className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                {searchTerm ? 'No cows found' : 'No cows yet'}
+                {searchTerm ? t('noCowsFound') : t('noCowsYet')}
               </h3>
               <p className="text-muted-foreground mb-4">
-                {searchTerm ? 'Try a different search term' : 'Add your first cow to get started'}
+                {searchTerm ? t('tryDifferentSearch') : t('addFirstCowDesc')}
               </p>
               {!searchTerm && (
                 <Button onClick={() => setDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Your First Cow
+                  {t('addFirstCow')}
                 </Button>
               )}
             </CardContent>
@@ -518,7 +520,7 @@ export default function CowManagement() {
                   <div className="space-y-2 text-sm">
                     {cow.breed && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Breed</span>
+                        <span className="text-muted-foreground">{t('breed')}</span>
                         <span className="text-foreground">{cow.breed}</span>
                       </div>
                     )}
@@ -526,14 +528,14 @@ export default function CowManagement() {
                       <div className="flex justify-between items-center">
                         <span className="text-muted-foreground flex items-center gap-1">
                           <Scale className="h-3 w-3" />
-                          Weight
+                          {t('weight')}
                         </span>
                         <span className="text-foreground">{cow.latestWeight || cow.weight} kg</span>
                       </div>
                     )}
                     {cow.date_of_birth && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Born</span>
+                        <span className="text-muted-foreground">{t('born')}</span>
                         <span className="text-foreground">
                           {new Date(cow.date_of_birth).toLocaleDateString()}
                         </span>
@@ -546,16 +548,16 @@ export default function CowManagement() {
                     <div className="mt-4 pt-4 border-t border-border">
                       <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
                         <Milk className="h-4 w-4 text-blue-500" />
-                        Milk Production
+                        {t('milkProduction')}
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div className="p-2 rounded bg-blue-500/10 text-center">
                           <p className="font-bold text-blue-500">{cow.milkProduction.today_liters.toFixed(1)}L</p>
-                          <p className="text-xs text-muted-foreground">Today</p>
+                          <p className="text-xs text-muted-foreground">{t('today')}</p>
                         </div>
                         <div className="p-2 rounded bg-purple-500/10 text-center">
                           <p className="font-bold text-purple-500">{cow.milkProduction.total_liters.toFixed(1)}L</p>
-                          <p className="text-xs text-muted-foreground">Total</p>
+                          <p className="text-xs text-muted-foreground">{t('total')}</p>
                         </div>
                       </div>
                     </div>
@@ -566,24 +568,24 @@ export default function CowManagement() {
                     <div className="mt-4 pt-4 border-t border-border space-y-2">
                       <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <Activity className="h-4 w-4 text-primary" />
-                        Latest Sensor Data
+                        {t('latestSensorData')}
                       </div>
                       <div className="space-y-1 text-sm">
                         {cow.latestHeatRecord.sensor_type && (
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Sensor</span>
+                            <span className="text-muted-foreground">{t('sensor')}</span>
                             <span className="text-foreground capitalize">{cow.latestHeatRecord.sensor_type.replace('_', ' ')}</span>
                           </div>
                         )}
                         {cow.latestHeatRecord.sensor_reading !== null && (
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Reading</span>
+                            <span className="text-muted-foreground">{t('reading')}</span>
                             <span className="text-foreground">{cow.latestHeatRecord.sensor_reading}</span>
                           </div>
                         )}
                         {cow.latestHeatRecord.intensity && (
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Heat Intensity</span>
+                            <span className="text-muted-foreground">{t('heatIntensity')}</span>
                             <Badge variant={
                               cow.latestHeatRecord.intensity === 'high' ? 'destructive' :
                               cow.latestHeatRecord.intensity === 'medium' ? 'default' : 'secondary'
@@ -594,12 +596,12 @@ export default function CowManagement() {
                         )}
                         {cow.latestHeatRecord.ai_confidence !== null && (
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">AI Confidence</span>
+                            <span className="text-muted-foreground">{t('aiConfidence')}</span>
                             <span className="text-foreground">{Math.round(cow.latestHeatRecord.ai_confidence * 100)}%</span>
                           </div>
                         )}
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Detected</span>
+                          <span className="text-muted-foreground">{t('detected')}</span>
                           <span className="text-foreground text-xs">
                             {new Date(cow.latestHeatRecord.detected_at).toLocaleString()}
                           </span>
@@ -616,7 +618,7 @@ export default function CowManagement() {
                       onClick={() => setSelectedCowForMilk(cow)}
                     >
                       <Milk className="h-4 w-4" />
-                      Milk
+                      {t('milk')}
                     </Button>
                     <Button 
                       size="sm" 
@@ -624,7 +626,7 @@ export default function CowManagement() {
                       onClick={() => setSelectedCowForHealth(cow)}
                     >
                       <Stethoscope className="h-4 w-4" />
-                      Health
+                      {t('health')}
                     </Button>
                     <Button 
                       size="sm" 
