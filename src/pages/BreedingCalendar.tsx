@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { 
   format, 
@@ -88,6 +89,7 @@ const EVENT_TYPES = [
 
 export default function BreedingCalendar() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState<BreedingEvent[]>([]);
   const [heatRecords, setHeatRecords] = useState<HeatRecord[]>([]);
@@ -214,11 +216,11 @@ export default function BreedingCalendar() {
       <div className="p-6 lg:p-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold text-foreground">Breeding Calendar</h1>
-            <p className="text-muted-foreground">Track breeding events and optimal timing</p>
+            <h1 className="font-display text-3xl font-bold text-foreground">{t('breedingCalendar')}</h1>
+            <p className="text-muted-foreground">{t('breedingCalendarDesc') || 'Track breeding events and optimal timing'}</p>
           </div>
           <Button variant="hero" onClick={() => setShowAddDialog(true)}>
-            <Plus className="h-4 w-4" /> Add Event
+            <Plus className="h-4 w-4" /> {t('addEvent')}
           </Button>
         </div>
 
