@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,6 +37,7 @@ export default function Auth() {
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const { t } = useLanguage();
   const { signIn, signUp, resetPassword, user } = useAuth();
   const navigate = useNavigate();
 
@@ -95,11 +97,11 @@ export default function Auth() {
         
         <Link to="/" className="relative z-10 flex items-center gap-3">
           <div className="h-12 w-12 rounded-xl overflow-hidden shadow-primary">
-            <img src="/logo.jpg" alt="Breeding App" className="h-full w-full object-cover" />
+            <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain" />
           </div>
           <div>
             <h1 className="font-display font-bold text-2xl text-foreground">Breeding App</h1>
-            <p className="text-sm text-muted-foreground">Smart Breeding Platform</p>
+            <p className="text-sm text-muted-foreground">{t('authTagline')}</p>
           </div>
         </Link>
 
@@ -145,7 +147,7 @@ export default function Auth() {
           <div className="lg:hidden flex justify-center mb-8">
             <Link to="/" className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-xl overflow-hidden shadow-primary">
-                <img src="/logo.jpg" alt="Breeding App" className="h-full w-full object-cover" />
+                <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain" />
               </div>
               <span className="font-display font-bold text-2xl text-foreground">Breeding App</span>
             </Link>
@@ -153,27 +155,27 @@ export default function Auth() {
 
           <div className="text-center lg:text-left">
             <h2 className="font-display text-3xl font-bold text-foreground">
-              {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome back' : 'Create account'}
+              {isForgotPassword ? t('authResetPasswordTitle') : isLogin ? t('authWelcomeBackTitle') : t('authCreateAccountTitle')}
             </h2>
             <p className="mt-2 text-muted-foreground">
               {isForgotPassword 
-                ? 'Enter your email to receive a reset link'
+                ? t('authResetPasswordSubtitle')
                 : isLogin 
-                  ? 'Sign in to access your farm dashboard' 
-                  : 'Get started with AI-powered breeding'}
+                  ? t('authLoginSubtitle')
+                  : t('authSignupSubtitle')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && !isForgotPassword && (
               <div className="space-y-2 animate-fade-in">
-                <Label htmlFor="name" className="text-foreground">Full Name</Label>
+                <Label htmlFor="name" className="text-foreground">{t('authFullName')}</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="name"
                     type="text"
-                    placeholder="John Farmer"
+                    placeholder={t('authFullNamePlaceholder')}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="pl-10 h-12 bg-card border-border focus:border-primary"
@@ -183,13 +185,13 @@ export default function Auth() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
+              <Label htmlFor="email" className="text-foreground">{t('authEmail')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@farm.com"
+                  placeholder={t('authEmailPlaceholder')}
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
@@ -205,13 +207,13 @@ export default function Auth() {
 
             {!isForgotPassword && (
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <Label htmlFor="password" className="text-foreground">{t('authPassword')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('authPasswordPlaceholder')}
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -236,7 +238,7 @@ export default function Auth() {
                   }}
                   className="text-sm text-primary hover:text-primary/80 transition-colors"
                 >
-                  Forgot password?
+                  {t('authForgotPassword')}
                 </button>
               </div>
             )}
@@ -251,11 +253,11 @@ export default function Auth() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  {isForgotPassword ? 'Sending...' : isLogin ? 'Signing in...' : 'Creating account...'}
+                  {isForgotPassword ? t('authSending') : isLogin ? t('authSigningIn') : t('authCreatingAccount')}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  {isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In' : 'Create Account'}
+                  {isForgotPassword ? t('authSendResetLink') : isLogin ? t('authSignIn') : t('authCreateAccountBtn')}
                   <ArrowRight className="h-4 w-4" />
                 </span>
               )}
@@ -272,7 +274,7 @@ export default function Auth() {
                 }}
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                <span className="font-semibold text-primary">← Back to Sign In</span>
+                <span className="font-semibold text-primary">{t('authBackToSignIn')}</span>
               </button>
             ) : (
               <button
@@ -284,9 +286,13 @@ export default function Auth() {
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 {isLogin ? (
-                  <>Don't have an account? <span className="font-semibold text-primary">Sign up</span></>
+                  <>
+                    {t('authNoAccount')} <span className="font-semibold text-primary">{t('authSignUp')}</span>
+                  </>
                 ) : (
-                  <>Already have an account? <span className="font-semibold text-primary">Sign in</span></>
+                  <>
+                    {t('authHaveAccount')} <span className="font-semibold text-primary">{t('authSignIn')}</span>
+                  </>
                 )}
               </button>
             )}

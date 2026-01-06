@@ -12,7 +12,7 @@ const CowIcon = ({ className }: { className?: string }) => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <path 
-      d="M12 4C10.5 4 9.5 5 9 6C8.5 5 7.5 4 6 4C4 4 2.5 5.5 2.5 7.5C2.5 9 3.5 10 4 10.5C3 11 2 12.5 2 14.5C2 17.5 4.5 20 8 20H16C19.5 20 22 17.5 22 14.5C22 12.5 21 11 20 10.5C20.5 10 21.5 9 21.5 7.5C21.5 5.5 20 4 18 4C16.5 4 15.5 5 15 6C14.5 5 13.5 4 12 4Z" 
+      d="M12 4C10.5 4 9.5 5 9 6C8.5 5 7.5 4 6 4C4 4 2.5 5.5 2.5 7.5C2.5 9 3.5 10 4 10.5C3 11 2 12.5 2 14.5C2 17.5 4.5 20 8 20H16C19.5 20 22 17.5 22 14.5C22 12.5 21 11 20 10.5C20.5 10 21.5 9 21.5 7.5C21.5 5.5 20 4 18 4C16.5 4 15.5 5 15 6C14.5 5 13.5 5 12 4Z" 
       fill="currentColor"
     />
     <circle cx="8.5" cy="12" r="1.5" fill="hsl(var(--background))" />
@@ -31,8 +31,8 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center shadow-primary">
-                <CowIcon className="h-6 w-6 text-primary-foreground" />
+              <div className="h-10 w-10 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden shadow-soft">
+                <img src="/logo.png" alt="Breeding App logo" className="h-7 w-7 object-contain" />
               </div>
               <span className="font-display font-bold text-xl text-foreground">Breeding App</span>
             </Link>
@@ -197,8 +197,8 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
-                <CowIcon className="h-5 w-5 text-primary-foreground" />
+              <div className="h-8 w-8 rounded-lg bg-card border border-border flex items-center justify-center overflow-hidden">
+                <img src="/logo.png" alt="Breeding App logo" className="h-5 w-5 object-contain" />
               </div>
               <span className="font-display font-bold text-foreground">Breeding App</span>
             </div>

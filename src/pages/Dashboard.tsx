@@ -185,7 +185,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="font-display text-3xl font-bold text-foreground">{t('dashboard')}</h1>
-          <p className="text-muted-foreground">Welcome back! Here's your farm overview.</p>
+          <p className="text-muted-foreground">{t('dashboardWelcome')}</p>
         </div>
 
         {/* Stats Grid */}
@@ -219,7 +219,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-muted-foreground">Loading...</p>
+              <p className="text-muted-foreground">{t('loading')}</p>
             ) : absentStaff.length === 0 ? (
               <p className="text-muted-foreground">{t('noAbsentStaff')}</p>
             ) : (
@@ -250,7 +250,7 @@ export default function Dashboard() {
             <div className="flex gap-2">
               {stockItems.length === 0 && !loading && (
                 <Button variant="outline" size="sm" onClick={addDefaultItems}>
-                  Add Recommended Items
+                  {t('addRecommendedItems')}
                 </Button>
               )}
               <Button variant="outline" size="sm" onClick={() => setShowAddItem(!showAddItem)}>
@@ -263,18 +263,18 @@ export default function Dashboard() {
             {showAddItem && (
               <div className="flex gap-2 mb-4">
                 <Input
-                  placeholder="Enter item name..."
+                  placeholder={t('enterItemName')}
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addCustomItem()}
                 />
                 <Button onClick={addCustomItem} disabled={!newItemName.trim()}>
-                  Add
+                  {t('add')}
                 </Button>
               </div>
             )}
             {loading ? (
-              <p className="text-muted-foreground">Loading...</p>
+              <p className="text-muted-foreground">{t('loading')}</p>
             ) : stockItems.length === 0 ? (
               <p className="text-muted-foreground">{t('noStockItems')}</p>
             ) : (
@@ -323,15 +323,15 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
-                <h4 className="font-semibold text-foreground mb-1">Optimal Breeding Time</h4>
+                <h4 className="font-semibold text-foreground mb-1">{t('tipOptimalBreedingTitle')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Best results are achieved 12-18 hours after heat detection. Use our AI to track cycles.
+                  {t('tipOptimalBreedingBody')}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                <h4 className="font-semibold text-foreground mb-1">AI Assistant Ready</h4>
+                <h4 className="font-semibold text-foreground mb-1">{t('tipAiAssistantTitle')}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Ask our AI chatbot any questions about breeding, health, or herd management.
+                  {t('tipAiAssistantBody')}
                 </p>
               </div>
             </CardContent>
@@ -344,10 +344,10 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-3">
                 {[
-                  { text: 'Add your first cow to the system', done: stats.totalCows > 0 },
-                  { text: 'Record a heat detection event', done: stats.recentHeatDetections > 0 },
-                  { text: 'Ask AI for breeding advice', done: false },
-                  { text: 'Configure your farm settings', done: false },
+                  { text: t('gsAddFirstCow'), done: stats.totalCows > 0 },
+                  { text: t('gsRecordHeat'), done: stats.recentHeatDetections > 0 },
+                  { text: t('gsAskAi'), done: false },
+                  { text: t('gsConfigureSettings'), done: false },
                 ].map((task, index) => (
                   <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
                     <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
