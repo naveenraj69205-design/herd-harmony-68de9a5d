@@ -118,8 +118,8 @@ export function usePushNotifications() {
 
     new Notification(title, {
       body,
-      icon: icon || '/favicon.svg',
-      badge: '/favicon.svg',
+      icon: icon || '/logo.png',
+      badge: '/logo.png',
     });
   }
 
