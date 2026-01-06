@@ -94,8 +94,8 @@ export default function Auth() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
         
         <Link to="/" className="relative z-10 flex items-center gap-3">
-          <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center shadow-primary">
-            <CowIcon className="h-7 w-7 text-primary-foreground" />
+          <div className="h-12 w-12 rounded-xl overflow-hidden shadow-primary">
+            <img src="/logo.jpg" alt="Breeding App" className="h-full w-full object-cover" />
           </div>
           <div>
             <h1 className="font-display font-bold text-2xl text-foreground">Breeding App</h1>
@@ -144,8 +144,8 @@ export default function Auth() {
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center mb-8">
             <Link to="/" className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-xl gradient-primary flex items-center justify-center shadow-primary">
-                <CowIcon className="h-7 w-7 text-primary-foreground" />
+              <div className="h-12 w-12 rounded-xl overflow-hidden shadow-primary">
+                <img src="/logo.jpg" alt="Breeding App" className="h-full w-full object-cover" />
               </div>
               <span className="font-display font-bold text-2xl text-foreground">Breeding App</span>
             </Link>
