@@ -87,8 +87,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-card/50 backdrop-blur-sm">
         <div className="p-6 border-b border-border">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center">
-              <CowIcon className="h-6 w-6 text-primary-foreground" />
+            <div className="h-10 w-10 rounded-xl overflow-hidden">
+              <img src="/logo.jpg" alt="Breeding App" className="h-full w-full object-cover" />
             </div>
             <div>
               <h1 className="font-display font-bold text-lg text-foreground">Breeding App</h1>
@@ -141,8 +141,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between p-4">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg gradient-primary flex items-center justify-center">
-              <CowIcon className="h-5 w-5 text-primary-foreground" />
+            <div className="h-9 w-9 rounded-lg overflow-hidden">
+              <img src="/logo.jpg" alt="Breeding App" className="h-full w-full object-cover" />
             </div>
             <span className="font-display font-bold text-foreground">Breeding App</span>
           </Link>

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Milk, Calendar, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -32,6 +33,7 @@ interface MilkProductionDialogProps {
 
 export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: MilkProductionDialogProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [records, setRecords] = useState<MilkRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -59,7 +61,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
           },
           (payload) => {
             setRecords(prev => [payload.new as MilkRecord, ...prev]);
-            toast.info('New milk production recorded by sensor');
+            toast.info(t('newMilkRecorded'));
           }
         )
         .subscribe();
@@ -82,7 +84,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
       .order('recorded_at', { ascending: false });
 
     if (error) {
-      toast.error('Failed to load milk production records');
+      toast.error(t('failedLoadMilk'));
     } else {
       setRecords(data || []);
     }
@@ -104,9 +106,9 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
     });
 
     if (error) {
-      toast.error('Failed to add milk production record');
+      toast.error(t('failedAddMilk'));
     } else {
-      toast.success('Milk production recorded');
+      toast.success(t('milkRecordAdded'));
       setShowForm(false);
       resetForm();
       fetchRecords();
@@ -146,7 +148,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Milk className="h-5 w-5" />
-            Milk Production - {cowName}
+            {t('milkProductionTitle')} - {cowName}
           </DialogTitle>
         </DialogHeader>
 
@@ -155,15 +157,15 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
           <div className="grid grid-cols-3 gap-4">
             <div className="p-4 rounded-lg bg-blue-500/10 text-center">
               <p className="text-2xl font-bold text-blue-500">{todayTotal.toFixed(1)}L</p>
-              <p className="text-xs text-muted-foreground">Today</p>
+              <p className="text-xs text-muted-foreground">{t('today')}</p>
             </div>
             <div className="p-4 rounded-lg bg-green-500/10 text-center">
               <p className="text-2xl font-bold text-green-500">{avgLiters.toFixed(1)}L</p>
-              <p className="text-xs text-muted-foreground">Avg/Session</p>
+              <p className="text-xs text-muted-foreground">{t('avgSession')}</p>
             </div>
             <div className="p-4 rounded-lg bg-purple-500/10 text-center">
               <p className="text-2xl font-bold text-purple-500">{totalLiters.toFixed(1)}L</p>
-              <p className="text-xs text-muted-foreground">30 Day Total</p>
+              <p className="text-xs text-muted-foreground">{t('thirtyDayTotalLabel')}</p>
             </div>
           </div>
 
@@ -172,7 +174,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
             <div className="h-48 p-4 border rounded-lg">
               <p className="text-sm font-medium mb-2 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
-                Production Trend (Last 14 Records)
+                {t('productionTrend')}
               </p>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
@@ -189,7 +191,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
           {!showForm && (
             <Button onClick={() => setShowForm(true)} variant="outline" className="w-full">
               <Plus className="h-4 w-4 mr-2" />
-              Record Manual Entry
+              {t('recordManualEntry')}
             </Button>
           )}
 
@@ -197,7 +199,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
             <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg bg-secondary/20">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Quantity (Liters) *</Label>
+                  <Label>{t('quantityLiters')} *</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -208,7 +210,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Quality Grade</Label>
+                  <Label>{t('qualityGrade')}</Label>
                   <Input
                     value={formData.quality_grade}
                     onChange={(e) => setFormData(prev => ({ ...prev, quality_grade: e.target.value }))}
@@ -219,7 +221,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Fat %</Label>
+                  <Label>{t('fatPercentage')}</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -229,7 +231,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Protein %</Label>
+                  <Label>{t('proteinPercentage')}</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -241,9 +243,9 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit" className="flex-1">Save Record</Button>
+                <Button type="submit" className="flex-1">{t('saveRecord')}</Button>
                 <Button type="button" variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </div>
             </form>
@@ -259,7 +261,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
             ) : records.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Milk className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No milk production records yet</p>
+                <p>{t('noMilkRecords')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -270,7 +272,7 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
                         <Milk className="h-5 w-5 text-blue-500" />
                       </div>
                       <div>
-                        <p className="font-medium">{Number(record.quantity_liters).toFixed(1)} Liters</p>
+                        <p className="font-medium">{Number(record.quantity_liters).toFixed(1)} {t('liters')}</p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {format(new Date(record.recorded_at), 'MMM d, HH:mm')}
@@ -279,10 +281,10 @@ export function MilkProductionDialog({ cowId, cowName, open, onOpenChange }: Mil
                     </div>
                     <div className="flex items-center gap-2">
                       {record.quality_grade && (
-                        <Badge variant="outline">Grade {record.quality_grade}</Badge>
+                        <Badge variant="outline">{t('grade')} {record.quality_grade}</Badge>
                       )}
                       {record.is_automatic && (
-                        <Badge className="bg-green-500">Auto</Badge>
+                        <Badge className="bg-green-500">{t('auto')}</Badge>
                       )}
                     </div>
                   </div>

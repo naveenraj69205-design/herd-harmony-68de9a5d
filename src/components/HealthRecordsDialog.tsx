@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Stethoscope, Calendar, Pill } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -44,8 +45,23 @@ const RECORD_TYPES = [
   'Other'
 ];
 
+const getRecordTypeKey = (type: string): string => {
+  const keyMap: Record<string, string> = {
+    'Vaccination': 'vaccination',
+    'Checkup': 'checkup',
+    'Treatment': 'treatment',
+    'Surgery': 'surgery',
+    'Deworming': 'deworming',
+    'Hoof Trimming': 'hoofTrimming',
+    'Pregnancy Check': 'pregnancyCheck',
+    'Other': 'other'
+  };
+  return keyMap[type] || type.toLowerCase();
+};
+
 export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: HealthRecordsDialogProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -76,7 +92,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
       .order('record_date', { ascending: false });
 
     if (error) {
-      toast.error('Failed to load health records');
+      toast.error(t('failedLoadHealth'));
     } else {
       setRecords(data || []);
     }
@@ -102,9 +118,9 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
     });
 
     if (error) {
-      toast.error('Failed to add health record');
+      toast.error(t('failedAddHealth'));
     } else {
-      toast.success('Health record added');
+      toast.success(t('healthRecordAdded'));
       setShowForm(false);
       resetForm();
       fetchRecords();
@@ -145,7 +161,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Stethoscope className="h-5 w-5" />
-            Health Records - {cowName}
+            {t('healthRecordsTitle')} - {cowName}
           </DialogTitle>
         </DialogHeader>
 
@@ -153,7 +169,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
           {!showForm && (
             <Button onClick={() => setShowForm(true)} variant="outline" className="w-full">
               <Plus className="h-4 w-4 mr-2" />
-              Add Health Record
+              {t('addHealthRecord')}
             </Button>
           )}
 
@@ -161,7 +177,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
             <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg bg-secondary/20">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Date *</Label>
+                  <Label>{t('date')} *</Label>
                   <Input
                     type="date"
                     required
@@ -170,7 +186,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Record Type *</Label>
+                  <Label>{t('recordType')} *</Label>
                   <Select
                     value={formData.record_type}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, record_type: value }))}
@@ -180,7 +196,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
                     </SelectTrigger>
                     <SelectContent>
                       {RECORD_TYPES.map(type => (
-                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                        <SelectItem key={type} value={type}>{t(getRecordTypeKey(type))}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -189,44 +205,44 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Diagnosis</Label>
+                  <Label>{t('diagnosis')}</Label>
                   <Input
                     value={formData.diagnosis}
                     onChange={(e) => setFormData(prev => ({ ...prev, diagnosis: e.target.value }))}
-                    placeholder="Enter diagnosis"
+                    placeholder={t('enterDiagnosis')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Veterinarian</Label>
+                  <Label>{t('veterinarian')}</Label>
                   <Input
                     value={formData.veterinarian}
                     onChange={(e) => setFormData(prev => ({ ...prev, veterinarian: e.target.value }))}
-                    placeholder="Vet name"
+                    placeholder={t('vetName')}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Treatment</Label>
+                <Label>{t('treatment')}</Label>
                 <Textarea
                   value={formData.treatment}
                   onChange={(e) => setFormData(prev => ({ ...prev, treatment: e.target.value }))}
-                  placeholder="Describe treatment"
+                  placeholder={t('describeTreatment')}
                   rows={2}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Medications</Label>
+                  <Label>{t('medications')}</Label>
                   <Input
                     value={formData.medications}
                     onChange={(e) => setFormData(prev => ({ ...prev, medications: e.target.value }))}
-                    placeholder="List medications"
+                    placeholder={t('listMedications')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Cost</Label>
+                  <Label>{t('cost')}</Label>
                   <Input
                     type="number"
                     value={formData.cost}
@@ -238,7 +254,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Follow-up Date</Label>
+                  <Label>{t('followUpDate')}</Label>
                   <Input
                     type="date"
                     value={formData.follow_up_date}
@@ -248,19 +264,19 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
               </div>
 
               <div className="space-y-2">
-                <Label>Notes</Label>
+                <Label>{t('notes')}</Label>
                 <Textarea
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="Additional notes..."
+                  placeholder={t('additionalNotes')}
                   rows={2}
                 />
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit" className="flex-1">Save Record</Button>
+                <Button type="submit" className="flex-1">{t('saveRecord')}</Button>
                 <Button type="button" variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>
-                  Cancel
+                  {t('cancel')}
                 </Button>
               </div>
             </form>
@@ -276,7 +292,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
             ) : records.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Stethoscope className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No health records yet</p>
+                <p>{t('noHealthRecords')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -285,7 +301,7 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <Badge className={getTypeBadgeColor(record.record_type)}>
-                          {record.record_type}
+                          {t(getRecordTypeKey(record.record_type))}
                         </Badge>
                         <span className="text-sm text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
@@ -298,23 +314,23 @@ export function HealthRecordsDialog({ cowId, cowName, open, onOpenChange }: Heal
                     </div>
                     
                     {record.diagnosis && (
-                      <p className="text-sm mb-1"><strong>Diagnosis:</strong> {record.diagnosis}</p>
+                      <p className="text-sm mb-1"><strong>{t('diagnosis')}:</strong> {record.diagnosis}</p>
                     )}
                     {record.treatment && (
-                      <p className="text-sm mb-1"><strong>Treatment:</strong> {record.treatment}</p>
+                      <p className="text-sm mb-1"><strong>{t('treatment')}:</strong> {record.treatment}</p>
                     )}
                     {record.medications && (
                       <p className="text-sm mb-1 flex items-center gap-1">
                         <Pill className="h-3 w-3" />
-                        <strong>Medications:</strong> {record.medications}
+                        <strong>{t('medications')}:</strong> {record.medications}
                       </p>
                     )}
                     {record.veterinarian && (
-                      <p className="text-sm text-muted-foreground">Vet: {record.veterinarian}</p>
+                      <p className="text-sm text-muted-foreground">{t('vet')}: {record.veterinarian}</p>
                     )}
                     {record.follow_up_date && (
                       <p className="text-sm text-muted-foreground">
-                        Follow-up: {format(new Date(record.follow_up_date), 'MMM d, yyyy')}
+                        {t('followUp')}: {format(new Date(record.follow_up_date), 'MMM d, yyyy')}
                       </p>
                     )}
                   </div>
