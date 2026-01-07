@@ -79,17 +79,18 @@ interface HeatRecord {
   };
 }
 
-const EVENT_TYPES = [
-  { id: 'heat_detected', name: 'Heat Detected', icon: Thermometer, color: 'bg-red-500' },
-  { id: 'insemination', name: 'Insemination', icon: Syringe, color: 'bg-blue-500' },
-  { id: 'pregnancy_check', name: 'Pregnancy Check', icon: Clock, color: 'bg-purple-500' },
-  { id: 'expected_calving', name: 'Expected Calving', icon: Baby, color: 'bg-green-500' },
-  { id: 'actual_calving', name: 'Actual Calving', icon: Baby, color: 'bg-emerald-500' },
+const getEventTypes = (t: (key: string) => string) => [
+  { id: 'heat_detected', name: t('heatDetected'), icon: Thermometer, color: 'bg-red-500' },
+  { id: 'insemination', name: t('insemination'), icon: Syringe, color: 'bg-blue-500' },
+  { id: 'pregnancy_check', name: t('pregnancyCheckEvent'), icon: Clock, color: 'bg-purple-500' },
+  { id: 'expected_calving', name: t('expectedCalving'), icon: Baby, color: 'bg-green-500' },
+  { id: 'actual_calving', name: t('actualCalving'), icon: Baby, color: 'bg-emerald-500' },
 ];
 
 export default function BreedingCalendar() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const EVENT_TYPES = getEventTypes(t);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState<BreedingEvent[]>([]);
   const [heatRecords, setHeatRecords] = useState<HeatRecord[]>([]);
@@ -323,13 +324,13 @@ export default function BreedingCalendar() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
-                {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Select a date'}
+                {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : t('selectADate')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {selectedDateEvents.heatRecords.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground mb-2">Heat Detections</h4>
+                  <h4 className="font-semibold text-sm text-muted-foreground mb-2">{t('heatDetections')}</h4>
                   {selectedDateEvents.heatRecords.map(heat => {
                     const optimal = calculateOptimalBreeding(new Date(heat.detected_at));
                     return (
@@ -340,11 +341,11 @@ export default function BreedingCalendar() {
                           <Badge className="bg-red-500">{heat.intensity}</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Detected: {format(new Date(heat.detected_at), 'h:mm a')}
+                          {t('detected')}: {format(new Date(heat.detected_at), 'h:mm a')}
                         </p>
                         <div className="mt-2 p-2 rounded bg-green-500/10 border border-green-500/20">
                           <p className="text-xs font-medium text-green-600">
-                            Optimal Breeding Window:
+                            {t('optimalBreedingWindow')}:
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {format(optimal.start, 'MMM d, h:mm a')} - {format(optimal.end, 'MMM d, h:mm a')}
@@ -358,7 +359,7 @@ export default function BreedingCalendar() {
 
               {selectedDateEvents.events.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground mb-2">Scheduled Events</h4>
+                  <h4 className="font-semibold text-sm text-muted-foreground mb-2">{t('scheduledEvents')}</h4>
                   {selectedDateEvents.events.map(event => {
                     const typeInfo = getEventTypeInfo(event.event_type);
                     const Icon = typeInfo.icon;
@@ -386,9 +387,9 @@ export default function BreedingCalendar() {
               {selectedDateEvents.events.length === 0 && selectedDateEvents.heatRecords.length === 0 && (
                 <div className="text-center py-8">
                   <CalendarDays className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">No events on this date</p>
+                  <p className="text-muted-foreground">{t('noEventsOnDate')}</p>
                   <Button variant="outline" className="mt-4" onClick={() => setShowAddDialog(true)}>
-                    <Plus className="h-4 w-4" /> Add Event
+                    <Plus className="h-4 w-4" /> {t('addEvent')}
                   </Button>
                 </div>
               )}
@@ -400,14 +401,14 @@ export default function BreedingCalendar() {
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add Breeding Event</DialogTitle>
+              <DialogTitle>{t('addBreedingEvent')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Select Cow *</Label>
+                <Label>{t('selectCow')} *</Label>
                 <Select value={selectedCow} onValueChange={setSelectedCow}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choose a cow" />
+                    <SelectValue placeholder={t('chooseCow')} />
                   </SelectTrigger>
                   <SelectContent>
                     {cows.map(cow => (
@@ -420,7 +421,7 @@ export default function BreedingCalendar() {
               </div>
 
               <div className="space-y-2">
-                <Label>Event Type</Label>
+                <Label>{t('eventType')}</Label>
                 <Select value={eventType} onValueChange={setEventType}>
                   <SelectTrigger>
                     <SelectValue />
@@ -439,7 +440,7 @@ export default function BreedingCalendar() {
               </div>
 
               <div className="space-y-2">
-                <Label>Date</Label>
+                <Label>{t('date')}</Label>
                 <div className="border rounded-lg p-3 max-h-[280px] overflow-y-auto">
                   <Calendar
                     mode="single"
@@ -451,30 +452,30 @@ export default function BreedingCalendar() {
               </div>
 
               <div className="space-y-2">
-                <Label>Title (optional)</Label>
+                <Label>{t('title')} ({t('optional')})</Label>
                 <Input
                   value={eventTitle}
                   onChange={e => setEventTitle(e.target.value)}
-                  placeholder="Auto-generated if empty"
+                  placeholder={t('autoGeneratedIfEmpty')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Description (optional)</Label>
+                <Label>{t('description')} ({t('optional')})</Label>
                 <Textarea
                   value={eventDescription}
                   onChange={e => setEventDescription(e.target.value)}
-                  placeholder="Additional notes..."
+                  placeholder={t('additionalNotes')}
                   rows={3}
                 />
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button onClick={handleAddEvent} disabled={submitting || !selectedCow || !selectedDate}>
-                {submitting ? 'Adding...' : 'Add Event'}
+                {submitting ? t('adding') : t('addEvent')}
               </Button>
             </DialogFooter>
           </DialogContent>

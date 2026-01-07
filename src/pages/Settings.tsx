@@ -81,7 +81,7 @@ export default function Settings() {
       <div className="p-6 lg:p-8 space-y-6">
         <div>
           <h1 className="font-display text-3xl font-bold text-foreground">{t('settings')}</h1>
-          <p className="text-muted-foreground">Manage your preferences</p>
+          <p className="text-muted-foreground">{t('settingsDesc')}</p>
         </div>
 
         {/* Profile Section */}
@@ -169,7 +169,7 @@ export default function Settings() {
           <CardHeader>
             <CardTitle className="font-display flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Push Notifications
+              {t('pushNotifications')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -177,9 +177,9 @@ export default function Settings() {
               <div className="flex items-center gap-3">
                 <Bell className="h-5 w-5" />
                 <div>
-                  <Label className="text-foreground font-medium">Enable Notifications</Label>
+                  <Label className="text-foreground font-medium">{t('enableNotifications')}</Label>
                   <p className="text-sm text-muted-foreground">
-                    {isSupported ? 'Get alerts for heat detection, sensor updates' : 'Not supported in this browser'}
+                    {isSupported ? t('notificationsSupportedDesc') : t('notificationsNotSupported')}
                   </p>
                 </div>
               </div>

@@ -100,7 +100,7 @@ export default function Auth() {
             <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
           </div>
           <div>
-            <h1 className="font-display font-bold text-2xl text-foreground">Breeding App</h1>
+            <h1 className="font-display font-bold text-2xl text-foreground">{t('appName')}</h1>
             <p className="text-sm text-muted-foreground">{t('authTagline')}</p>
           </div>
         </Link>
@@ -149,7 +149,7 @@ export default function Auth() {
               <div className="h-12 w-12 rounded-xl overflow-hidden shadow-primary">
                 <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
               </div>
-              <span className="font-display font-bold text-2xl text-foreground">Breeding App</span>
+              <span className="font-display font-bold text-2xl text-foreground">{t('appName')}</span>
             </Link>
           </div>
 
