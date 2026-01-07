@@ -32,7 +32,7 @@ export default function Landing() {
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden shadow-soft">
-                <img src="/logo.png" alt="Breeding App logo" className="h-7 w-7 object-contain" />
+                <img src="/logo.png" alt="Breeding App logo" className="h-7 w-7 object-contain logo-adaptive" />
               </div>
               <span className="font-display font-bold text-xl text-foreground">Breeding App</span>
             </Link>

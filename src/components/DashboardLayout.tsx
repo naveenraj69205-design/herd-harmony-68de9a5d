@@ -88,7 +88,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <div className="p-6 border-b border-border">
           <Link to="/dashboard" className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl overflow-hidden">
-              <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain" />
+              <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
             </div>
             <div>
               <h1 className="font-display font-bold text-lg text-foreground">Breeding App</h1>
@@ -142,7 +142,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-between p-4">
           <Link to="/dashboard" className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg overflow-hidden">
-              <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain" />
+              <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
             </div>
             <span className="font-display font-bold text-foreground">Breeding App</span>
           </Link>

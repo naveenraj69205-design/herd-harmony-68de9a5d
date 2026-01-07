@@ -97,7 +97,7 @@ export default function Auth() {
         
         <Link to="/" className="relative z-10 flex items-center gap-3">
           <div className="h-12 w-12 rounded-xl overflow-hidden shadow-primary">
-            <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain" />
+            <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
           </div>
           <div>
             <h1 className="font-display font-bold text-2xl text-foreground">Breeding App</h1>
@@ -147,7 +147,7 @@ export default function Auth() {
           <div className="lg:hidden flex justify-center mb-8">
             <Link to="/" className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-xl overflow-hidden shadow-primary">
-                <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain" />
+                <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
               </div>
               <span className="font-display font-bold text-2xl text-foreground">Breeding App</span>
             </Link>

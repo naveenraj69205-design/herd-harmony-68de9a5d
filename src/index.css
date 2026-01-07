@@ -190,6 +190,15 @@
   .animate-slide-in-left {
     animation: slideInLeft 0.4s ease-out forwards;
   }
+
+  /* Logo dark mode - invert black to green */
+  .logo-adaptive {
+    filter: none;
+  }
+  
+  .dark .logo-adaptive {
+    filter: invert(48%) sepia(79%) saturate(383%) hue-rotate(93deg) brightness(95%) contrast(88%);
+  }
 }
 
 @keyframes float {
