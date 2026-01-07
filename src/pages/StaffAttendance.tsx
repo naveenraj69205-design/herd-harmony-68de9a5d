@@ -340,7 +340,7 @@ export default function StaffAttendance() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{presentCount}</p>
-                  <p className="text-xs text-muted-foreground">Present Now</p>
+                  <p className="text-xs text-muted-foreground">{t('presentNow')}</p>
                 </div>
               </div>
             </CardContent>
@@ -353,7 +353,7 @@ export default function StaffAttendance() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{checkedOutCount}</p>
-                  <p className="text-xs text-muted-foreground">Checked Out</p>
+                  <p className="text-xs text-muted-foreground">{t('checkedOut')}</p>
                 </div>
               </div>
             </CardContent>
@@ -366,7 +366,7 @@ export default function StaffAttendance() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{staff.length - presentCount - checkedOutCount}</p>
-                  <p className="text-xs text-muted-foreground">Not Checked In</p>
+                  <p className="text-xs text-muted-foreground">{t('notCheckedIn')}</p>
                 </div>
               </div>
             </CardContent>
@@ -379,7 +379,7 @@ export default function StaffAttendance() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{staff.length}</p>
-                  <p className="text-xs text-muted-foreground">Total Staff</p>
+                  <p className="text-xs text-muted-foreground">{t('totalStaff')}</p>
                 </div>
               </div>
             </CardContent>
@@ -391,7 +391,7 @@ export default function StaffAttendance() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Today's Attendance - {format(new Date(), 'MMMM d, yyyy')}
+              {t('todayAttendance')} - {format(new Date(), 'MMMM d, yyyy')}
             </CardTitle>
           </CardHeader>
           <CardContent>

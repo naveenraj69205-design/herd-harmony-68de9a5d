@@ -91,8 +91,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
             </div>
             <div>
-              <h1 className="font-display font-bold text-lg text-foreground">Breeding App</h1>
-              <p className="text-xs text-muted-foreground">Smart Breeding</p>
+              <h1 className="font-display font-bold text-lg text-foreground">{t('appName')}</h1>
+              <p className="text-xs text-muted-foreground">{t('authTagline')}</p>
             </div>
           </Link>
         </div>
@@ -144,7 +144,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <div className="h-9 w-9 rounded-lg overflow-hidden">
               <img src="/logo.png" alt="Breeding App logo" className="h-full w-full object-contain logo-adaptive" />
             </div>
-            <span className="font-display font-bold text-foreground">Breeding App</span>
+            <span className="font-display font-bold text-foreground">{t('appName')}</span>
           </Link>
           <Button 
             variant="ghost" 

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, BarChart3, Brain, Thermometer, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Natural cow SVG icon component
 const CowIcon = ({ className }: { className?: string }) => (
@@ -23,6 +24,7 @@ const CowIcon = ({ className }: { className?: string }) => (
 
 export default function Landing() {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen gradient-hero">
@@ -34,7 +36,7 @@ export default function Landing() {
               <div className="h-10 w-10 rounded-xl bg-card border border-border flex items-center justify-center overflow-hidden shadow-soft">
                 <img src="/logo.png" alt="Breeding App logo" className="h-7 w-7 object-contain logo-adaptive" />
               </div>
-              <span className="font-display font-bold text-xl text-foreground">Breeding App</span>
+              <span className="font-display font-bold text-xl text-foreground">{t('appName')}</span>
             </Link>
 
             <div className="flex items-center gap-4">
@@ -200,7 +202,7 @@ export default function Landing() {
               <div className="h-8 w-8 rounded-lg bg-card border border-border flex items-center justify-center overflow-hidden">
                 <img src="/logo.png" alt="Breeding App logo" className="h-5 w-5 object-contain" />
               </div>
-              <span className="font-display font-bold text-foreground">Breeding App</span>
+              <span className="font-display font-bold text-foreground">{t('appName')}</span>
             </div>
             <p className="text-sm text-muted-foreground">
               © 2024 Breeding App. All rights reserved.
