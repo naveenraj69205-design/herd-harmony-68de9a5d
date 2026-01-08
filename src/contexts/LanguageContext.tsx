@@ -728,7 +728,7 @@ const translations: Record<Language, Record<string, string>> = {
     gsAddStaff: 'Add Staff',
     gsConfigureSettings: 'Configure your farm settings',
     // App name
-    appName: 'Breeding App',
+    appName: 'AI-FARM APP',
     // Settings
     settingsDesc: 'Manage your preferences',
     pushNotifications: 'Push Notifications',
@@ -913,7 +913,7 @@ const translations: Record<Language, Record<string, string>> = {
     voiceDisabled: 'Voz deshabilitada',
     transcribing: 'Transcribiendo...',
     // App name
-    appName: 'Breeding App',
+    appName: 'AI-FARM APP',
     // Settings
     settingsDesc: 'Administra tus preferencias',
     pushNotifications: 'Notificaciones Push',
@@ -1098,7 +1098,7 @@ const translations: Record<Language, Record<string, string>> = {
     voiceDisabled: 'Voix désactivée',
     transcribing: 'Transcription...',
     // App name
-    appName: 'Breeding App',
+    appName: 'AI-FARM APP',
     // Settings
     settingsDesc: 'Gérer vos préférences',
     pushNotifications: 'Notifications Push',
@@ -1252,7 +1252,7 @@ const translations: Record<Language, Record<string, string>> = {
     voiceDisabled: 'Sauti imezimwa',
     transcribing: 'Kuandika...',
     // App name
-    appName: 'Breeding App',
+    appName: 'AI-FARM APP',
     // Settings
     settingsDesc: 'Simamia mapendeleo yako',
     pushNotifications: 'Arifa za Push',
@@ -1437,7 +1437,7 @@ const translations: Record<Language, Record<string, string>> = {
     voiceDisabled: 'குரல் முடக்கப்பட்டது',
     transcribing: 'எழுதுகிறது...',
     // App name
-    appName: 'Breeding App',
+    appName: 'AI-FARM APP',
     // Settings
     settingsDesc: 'உங்கள் விருப்பங்களை நிர்வகிக்கவும்',
     pushNotifications: 'புஷ் அறிவிப்புகள்',
@@ -1622,7 +1622,7 @@ const translations: Record<Language, Record<string, string>> = {
     voiceDisabled: 'आवाज अक्षम',
     transcribing: 'लिख रहा है...',
     // App name
-    appName: 'Breeding App',
+    appName: 'AI-FARM APP',
     // Settings
     settingsDesc: 'अपनी प्राथमिकताएं प्रबंधित करें',
     pushNotifications: 'पुश सूचनाएं',
