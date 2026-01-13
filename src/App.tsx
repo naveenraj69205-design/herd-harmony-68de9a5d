@@ -18,6 +18,7 @@ import StaffAttendance from "./pages/StaffAttendance";
 import BreedingCalendar from "./pages/BreedingCalendar";
 import Analytics from "./pages/Analytics";
 import SensorDashboard from "./pages/SensorDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
                 <Route path="/calendar" element={<ProtectedRoute><BreedingCalendar /></ProtectedRoute>} />
                 <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                 <Route path="/sensors" element={<ProtectedRoute><SensorDashboard /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
