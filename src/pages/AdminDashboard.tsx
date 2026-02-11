@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Milk, MapPin, PawPrint, Shield, TrendingUp } from 'lucide-react';
+import { Users, Milk, MapPin, PawPrint, Shield, TrendingUp, UserCog } from 'lucide-react';
+import { AdminRoleManagement } from '@/components/AdminRoleManagement';
 import { toast } from 'sonner';
 import { Navigate } from 'react-router-dom';
 
@@ -237,6 +238,10 @@ export default function AdminDashboard() {
               <Milk className="h-4 w-4" />
               {t('milkProduction')}
             </TabsTrigger>
+            <TabsTrigger value="roles" className="flex items-center gap-2">
+              <UserCog className="h-4 w-4" />
+              {t('roleManagement')}
+            </TabsTrigger>
           </TabsList>
 
           {/* Users Tab */}
@@ -388,6 +393,11 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Roles Tab */}
+          <TabsContent value="roles">
+            <AdminRoleManagement />
           </TabsContent>
         </Tabs>
       </div>
