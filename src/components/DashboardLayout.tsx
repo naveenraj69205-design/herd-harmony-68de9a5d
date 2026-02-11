@@ -10,13 +10,15 @@ import {
   Users,
   CalendarDays,
   BarChart3,
-  Radio
+  Radio,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,8 +71,20 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const navItems = getNavItems(t);
+  useEffect(() => {
+    if (user) {
+      supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' }).then(({ data }) => {
+        setIsAdmin(!!data);
+      });
+    }
+  }, [user]);
+
+  const navItems = [
+    ...getNavItems(t),
+    ...(isAdmin ? [{ icon: Shield, label: t('adminDashboard'), path: '/admin' }] : []),
+  ];
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
